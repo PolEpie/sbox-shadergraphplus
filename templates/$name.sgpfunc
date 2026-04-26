@@ -23,7 +23,6 @@
   "nodes": [
     {
       "_class": "SubgraphOutput",
-      "__version": 1,
       "OutputIdentifier": "56022ee5-9c59-48c1-8458-52c33c32d8cc",
       "OutputName": "Output0",
       "OutputDescription": "",
