@@ -84,15 +84,17 @@ public sealed partial class GraphCompiler
 		public Dictionary<string, TextureInput> TextureInputs = new();
 		public Dictionary<string, Gradient> Gradients = new();
 		public Dictionary<string, (string Options, NodeResult Result)> Parameters = new();
+		public Dictionary<string, string> Globals { get; private set; } = new();
 		public Dictionary<string, object> Attributes { get; private set; } = new();
 		public HashSet<string> Functions { get; private set; } = new();
-		public Dictionary<string, string> Globals { get; private set; } = new();
 
 		public string RepresentativeTexture { get; set; }
-
-		public void SetAttributes( Dictionary<string, object> attributes )
+		
+		internal void Replace( Dictionary<string, string> globals, Dictionary<string, object> attributes, HashSet<string> functions )
 		{
+			Globals = globals;
 			Attributes = attributes;
+			Functions = functions;
 		}
 	}
 

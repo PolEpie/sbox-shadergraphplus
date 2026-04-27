@@ -1,4 +1,4 @@
-﻿namespace ShaderGraphPlus;
+namespace ShaderGraphPlus;
 
 [System.AttributeUsage( AttributeTargets.Property )]
 internal sealed class ShaderFeatureReferenceAttribute : Attribute
@@ -74,19 +74,47 @@ public class ShaderFeatureBoolean : ShaderFeatureBase
 	}
 }
 
+public sealed class ShaderFeatureEnumOption : IValid
+{
+	[Hide]
+	public Guid Id { get; set; }
+
+	[KeyProperty]
+	public string Name { get; set; }
+
+	[Hide, JsonIgnore]
+	public bool IsValid => !string.IsNullOrWhiteSpace( Name );
+
+	public ShaderFeatureEnumOption()
+	{
+		Id = Guid.NewGuid();
+	}
+
+
+	public override string ToString()
+	{
+		return Name;
+	}
+
+	public override int GetHashCode()
+	{
+		return System.HashCode.Combine( Id, Name );
+	}
+}
+
 public class ShaderFeatureEnum : ShaderFeatureBase
 {
 	[Hide, JsonIgnore, Browsable( false )]
-	public override bool IsValid => !string.IsNullOrWhiteSpace( Name ) && Options.All( x => !string.IsNullOrWhiteSpace( x ) );
+	public override bool IsValid => !string.IsNullOrWhiteSpace( Name ) && Options.All( x => !string.IsNullOrWhiteSpace( x.Name ) );
 
 	/// <summary>
 	/// Options of your feature. Must have no special characters. Note : all lowercase letters will be converted to uppercase.
 	/// </summary>
-	public List<string> Options { get; set; }
+	public List<ShaderFeatureEnumOption> Options { get; set; }
 
 	public ShaderFeatureEnum() : base()
 	{
-		Options = new List<string>();
+		Options = new List<ShaderFeatureEnumOption>();
 	}
 
 	public override int GetHashCode()

@@ -10,7 +10,7 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 	public override Color NodeTitleColor { get; set; } = ShaderGraphPlusTheme.NodeHeaderColors.LogicNode;
 
 	[Hide, JsonIgnore, Browsable( false )]
-	public override string Title => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
+	public override string Title => $"F_{_lastName.ToUpper().Replace( " ", "_" )}";
 
 	[Hide, JsonIgnore, Browsable( false )]
 	public string Name => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
@@ -19,11 +19,10 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 	public Guid ParameterIdentifier { get; set; }
 
 	[Hide, JsonIgnore, Browsable( false )]
-	public ShaderFeatureEnum Feature => GetFeature();
-
-	[global::Editor( ControlWidgetCustomEditors.ShaderFeatureEnumPreviewIndexEditor )]
-	[Title( "Preview" )]
-	public int PreviewIndex { get; set; } = 0;
+	public ShaderFeatureEnum Feature
+	{
+		get => GetFeature();
+	}
 
 	[Hide]
 	private List<IPlugIn> InternalInputs = new();
@@ -33,50 +32,125 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 
 	[Hide, JsonIgnore]
 	int _lastHashCodeInputs = 0;
-
-	//[Hide, JsonIgnore]
-	//bool _hasFeatureError = false;
+	[Hide, JsonIgnore]
+	string _lastName = "";
 
 	public override void OnFrame()
 	{
-		var hashCodeInput = Feature.GetHashCode();
-		if ( hashCodeInput != _lastHashCodeInputs )
+		var hashCodeInput = new HashCode();
+
+		hashCodeInput.Add( Feature );
+
+		var hc = hashCodeInput.ToHashCode();
+
+		if ( hc != _lastHashCodeInputs )
 		{
-			//var oldHashCode = _lastHashCodeInputs;
-			_lastHashCodeInputs = hashCodeInput;
+			_lastHashCodeInputs = hc;
+			_lastName = Feature.Name;
 
-			//SGPLog.Info( $"HashCode changed from : {oldHashCode} to {_lastHashCodeInputs}" );
-
-			// Dont update or change if feature is not valid!
-			if ( Feature.IsValid )
-			{
-				CreateInputs();
-				Update();
-			}
+			CreateInputs();
+			Update();
 		}
 	}
 
-	private ShaderFeatureEnum GetFeature()
+	public void InitializeNode()
+	{
+		OnNodeCreated();
+	}
+
+	private void OnNodeCreated()
+	{
+		CreateInputs();
+		Update();
+	}
+
+	public void CreateInputs()
+	{
+		var plugs = new List<IPlugIn>();
+
+		if ( !Feature.IsValid )
+			return;
+
+		if ( Feature.Options == null )
+		{
+			InternalInputs = new();
+		}
+		else
+		{
+			foreach ( var option in Feature.Options )
+			{
+				if ( !option.IsValid ) continue;
+
+				var info = new PlugInfo()
+				{
+					Id = option.Id,
+					Name = option.Name,
+					Type = typeof( object ),
+					DisplayInfo = new()
+					{
+						Name = option.Name,
+						Fullname = typeof( object ).FullName
+					}
+				};
+
+				var plug = new BasePlugIn( this, info, info.Type );
+				//var oldPlug = InternalInputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Name == info.Name ) as BasePlugIn;
+				var oldPlug = InternalInputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Id == info.Id ) as BasePlugIn;
+				if ( oldPlug is not null )
+				{
+					oldPlug.Info.Name = info.Name;
+					oldPlug.Info.Type = info.Type;
+					oldPlug.Info.DisplayInfo = info.DisplayInfo;
+
+					if ( oldPlug.Type != plug.Type )
+					{
+						plugs.Add( plug );
+					}
+					else
+					{
+						plugs.Add( oldPlug );
+					}
+				}
+				else
+				{
+					plugs.Add( plug );
+				}
+			}
+
+			InternalInputs = plugs;
+		}
+	}
+
+	private ShaderFeatureEnumParameter GetFeatureParameter()
 	{
 		if ( Graph is ShaderGraphPlus graph )
 		{
 			var parameter = graph.FindParameter<ShaderFeatureEnumParameter>( ParameterIdentifier );
 
-			if ( parameter.IsValid )
-			{
-				var featureEnum = new ShaderFeatureEnum
-				{
-					Name = parameter.Name,
-					Description = parameter.Description,
-					HeaderName = parameter.HeaderName,
-					Options = parameter.Options,
-				};
-
-				return featureEnum;
-			}
+			return parameter;
 		}
 
-		return null;
+		return new ShaderFeatureEnumParameter();
+	}
+
+	private ShaderFeatureEnum GetFeature()
+	{
+		var parameter = GetFeatureParameter();
+		
+		if ( parameter.IsValid )
+		{
+			var featureEnum = new ShaderFeatureEnum
+			{
+				Name = parameter.Name,
+				Description = parameter.Description,
+				HeaderName = parameter.HeaderName,
+				Options = parameter.Options,
+			};
+		
+			return featureEnum;
+		}
+
+		return new ShaderFeatureEnum();
 	}
 
 	[Output, Hide]
@@ -100,67 +174,11 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 			}
 		}
 
-		var result = compiler.ResultFeatureSwitch( inputs, Feature, PreviewIndex );
+		var previewIndex = GetFeatureParameter().PreviewIndex;
+		var result = compiler.ResultFeatureSwitch( inputs, Feature, previewIndex );
 
 		return result.IsValid ? result : new NodeResult( ResultType.Float, $"1.0f" );
 	};
-
-	public void InitializeNode()
-	{
-		OnNodeCreated();
-	}
-
-	private void OnNodeCreated()
-	{
-		CreateInputs();
-		Update();
-	}
-
-	public void CreateInputs()
-	{
-		var inPlugs = new List<IPlugIn>();
-
-		if ( Feature.Options == null )
-		{
-			InternalInputs = new();
-		}
-		else
-		{
-			foreach ( var input in Feature.Options )
-			{
-				var inputName = input;
-				// Default to float.
-				var inputType = typeof( float );//typeof( object );
-
-				if ( string.IsNullOrWhiteSpace( inputName ) ) continue;
-
-				var info = new PlugInfo()
-				{
-					Name = inputName,
-					Type = inputType,
-					DisplayInfo = new DisplayInfo()
-					{
-						Name = inputName,
-						Fullname = inputType.FullName
-					}
-				};
-
-				var plug = new BasePlugIn( this, info, inputType );
-				var oldPlug = InternalInputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Name == info.Name && plugIn.Info.Type == info.Type ) as BasePlugIn;
-				if ( oldPlug is not null )
-				{
-					oldPlug.Info.Name = info.Name;
-					oldPlug.Info.Type = info.Type;
-					oldPlug.Info.DisplayInfo = info.DisplayInfo;
-					plug = oldPlug;
-				}
-
-				inPlugs.Add( plug );
-			}
-
-			InternalInputs = inPlugs;
-		}
-	}
 
 	public List<string> GetErrors()
 	{

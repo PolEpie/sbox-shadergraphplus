@@ -1,4 +1,5 @@
 ﻿using Editor;
+using ShaderGraphPlus.Nodes;
 
 namespace ShaderGraphPlus;
 
@@ -361,7 +362,7 @@ public abstract class BaseNodePlus : IGraphNode
 	{
 		if ( _graph is not null )
 		{
-			if ( Graph is ShaderGraphPlus sgp && !sgp.IsSubgraph && this is IParameterNode )
+			if ( Graph is ShaderGraphPlus sgp && !sgp.IsSubgraph && this is not BooleanFeatureSwitchNode && this is IParameterNode )
 			{
 				Inputs = new List<IPlugIn>();
 			}

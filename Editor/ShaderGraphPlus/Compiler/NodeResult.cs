@@ -24,15 +24,6 @@ internal enum MetadataType
 	ComboSwitchBody
 }
 
-[Flags]
-internal enum NodeResultFlags
-{
-	None = 0,
-	SkipLocalGeneration = 1 << 0,
-	ShouldPreview = 1 << 1,
-	IsMetaDataResult = 1 << 2,
-}
-
 public struct NodeResult : IValid
 {
 	public delegate NodeResult Func( GraphCompiler compiler );

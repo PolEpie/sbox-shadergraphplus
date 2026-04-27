@@ -1,4 +1,6 @@
-﻿namespace ShaderGraphPlus;
+﻿using static ShaderGraphPlus.ShaderGraphPlusGlobals;
+
+namespace ShaderGraphPlus;
 
 /// <summary>
 /// Bool value material parameter
@@ -254,6 +256,9 @@ public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IShader
 	/// </summary>
 	public string HeaderName { get; set; }
 
+	[Title( "Preview" )]
+	public bool Preview { get; set; } = false;
+
 	public ShaderFeatureBooleanParameter() : base()
 	{
 	}
@@ -276,7 +281,7 @@ public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IShader
 public sealed class ShaderFeatureEnumParameter : BlackboardParameter, IShaderFeatureParameter
 {
 	[Hide, JsonIgnore, Browsable( false )]
-	public override bool IsValid => !string.IsNullOrWhiteSpace( Name ) && Options.All( x => !string.IsNullOrWhiteSpace( x ) );
+	public override bool IsValid => !string.IsNullOrWhiteSpace( Name ) && Options.All( x => !string.IsNullOrWhiteSpace( x.Name ) );
 
 	/// <summary>
 	/// Name of this feature.
@@ -298,11 +303,15 @@ public sealed class ShaderFeatureEnumParameter : BlackboardParameter, IShaderFea
 	/// <summary>
 	/// Options of your feature. Must have no special characters. Note : all lowercase letters will be converted to uppercase.
 	/// </summary>
-	public List<string> Options { get; set; }
+	public List<ShaderFeatureEnumOption> Options { get; set; }
+
+	[global::Editor( ControlWidgetCustomEditors.ShaderFeatureEnumPreviewIndexEditor )]
+	[Title( "Preview" )]
+	public int PreviewIndex { get; set; } = 0;
 
 	public ShaderFeatureEnumParameter() : base()
 	{
-		Options = new List<string>();
+		Options = new List<ShaderFeatureEnumOption>();
 	}
 
 	public override object GetValue()

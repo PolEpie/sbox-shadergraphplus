@@ -102,14 +102,14 @@ public sealed partial class GraphCompiler
 			}
 			else
 			{
-				blockResults.Add( SubGenerate( input, input.Identifier, shaderFeature ) );
+				blockResults.Add( GenerateSwitchBlockCode( input, input.Identifier, shaderFeature ) );
 			}
 		}
 
 		if ( !blockResults.Any() )
 			return default;
 
-		var resultType = blockResults.Select( x => x.Result.ResultType ).Where( x => !((int)x > 6) ).Max();
+		var resultType = blockResults.Select( x => x.Result.ResultType ).Where( x => x != ResultType.Invalid && !((int)x > 6) ).Max();
 		var id = 0;
 
 		while ( ShaderResult.ShaderFeatureResultStrings.Contains( $"{shaderFeature.Name}_result{id}" ) )
@@ -201,7 +201,7 @@ public sealed partial class GraphCompiler
 		return finalResult;
 	}
 
-	private SwitchBlockResultHolder SubGenerate( NodeInput input, string blockName, ShaderFeatureBase shaderFeature )
+	private SwitchBlockResultHolder GenerateSwitchBlockCode( NodeInput input, string blockName, ShaderFeatureBase shaderFeature )
 	{
 		var outerResult = ShaderResult;
 		var outerInputStack = InputStack;
@@ -209,17 +209,38 @@ public sealed partial class GraphCompiler
 		if ( IsVs )
 		{
 			VertexResult = new();
-			VertexResult.SetAttributes( outerResult.Attributes );
+			VertexResult.Replace( outerResult.Globals, outerResult.Attributes, outerResult.Functions );
 		}
 		else
 		{
 			PixelResult = new();
-			PixelResult.SetAttributes( outerResult.Attributes );
+			PixelResult.Replace( outerResult.Globals, outerResult.Attributes, outerResult.Functions );
 		}
+
 		InputStack = new();
 
 		var result = Result( input );
-		var blockCode = GenerateLocals( true );
+		var codeBlock = GenerateLocals( true );
+
+		foreach ( var samplerState in ShaderResult.SamplerStates )
+		{
+			outerResult.SamplerStates[samplerState.Key] = samplerState.Value;
+		}
+
+		foreach ( var textureInput in ShaderResult.TextureInputs )
+		{
+			outerResult.TextureInputs[textureInput.Key] = textureInput.Value;
+		}
+
+		foreach ( var gradient in ShaderResult.Gradients )
+		{
+			outerResult.Gradients[gradient.Key] = gradient.Value;
+		}
+
+		foreach ( var parameter in ShaderResult.Parameters )
+		{
+			outerResult.Parameters[parameter.Key] = parameter.Value;
+		}
 
 		foreach ( var attribute in ShaderResult.Attributes )
 		{
@@ -236,9 +257,9 @@ public sealed partial class GraphCompiler
 		}
 		InputStack = outerInputStack;
 
-		//SGPLog.Info( $"GeneratedBlock {block} : \n {{ {IndentString( blockCode, 1)} \n }}" );
+		//SGPLogger.Info( $"GeneratedBlock {blockName} : \n {{ {IndentString( codeBlock, 1)} \n }}" );
 
-		return new( blockCode, result );
+		return new( codeBlock, result );
 	}
 
 	private static StringBuilder BuildSwitchBlock( StringBuilder sb, string generatedLocals, string resultAssignmentLocal, NodeResult lastResult )
@@ -251,7 +272,7 @@ public sealed partial class GraphCompiler
 		return sb;
 	}
 
-	private static string BuildFeatureOptionsBody( List<string> options )
+	private static string BuildFeatureOptionsBody( List<ShaderFeatureEnumOption> options )
 	{
 		var options_body = "";
 		int count = 0;
@@ -260,17 +281,17 @@ public sealed partial class GraphCompiler
 		{
 			if ( count == 0 ) // first option starts at 0 :)
 			{
-				options_body += $"0=\"{option}\", ";
+				options_body += $"0=\"{option.Name}\", ";
 				count++;
 			}
 			else if ( count != (options.Count - 1) )  // These options dont get the privilege of being the first >:)
 			{
-				options_body += $"{count}=\"{option}\", ";
+				options_body += $"{count}=\"{option.Name}\", ";
 				count++;
 			}
 			else // Last option in the list oh well...:(
 			{
-				options_body += $"{count}=\"{option}\"";
+				options_body += $"{count}=\"{option.Name}\"";
 			}
 		}
 

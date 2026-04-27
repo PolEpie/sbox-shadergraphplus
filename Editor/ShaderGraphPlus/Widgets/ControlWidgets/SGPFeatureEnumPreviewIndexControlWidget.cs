@@ -7,22 +7,21 @@ namespace ShaderGraphPlus;
 [CustomEditor( typeof( int ), NamedEditor = ControlWidgetCustomEditors.ShaderFeatureEnumPreviewIndexEditor )]
 internal sealed class SGPFeatureEnumPreviewIndexControlWidget : DropdownControlWidgetPlus<int>
 {
-	EnumFeatureSwitchNode Node;
-
-	Entry SelectedEntry;
-	int SelectedIndex;
+	private ShaderFeatureEnumParameter _featureEnumParameter;
+	private Entry _selectedEntry;
+	private int _selectedIndex;
 
 	public SGPFeatureEnumPreviewIndexControlWidget( SerializedProperty property ) : base( property )
 	{
-		Node = property.Parent.Targets.OfType<EnumFeatureSwitchNode>().FirstOrDefault();
+		_featureEnumParameter = property.Parent.Targets.OfType<ShaderFeatureEnumParameter>().FirstOrDefault();
 
-		if ( Node is null ) return;
+		if ( _featureEnumParameter is null ) return;
 
 		var currentSelctedIndex = SerializedProperty.GetValue<int>();
 		if ( TryGetEntryFromIndex( currentSelctedIndex, out var entry ) )
 		{
-			SelectedEntry = entry;
-			SelectedIndex = currentSelctedIndex;
+			_selectedEntry = entry;
+			_selectedIndex = currentSelctedIndex;
 		}
 		else
 		{
@@ -51,9 +50,9 @@ internal sealed class SGPFeatureEnumPreviewIndexControlWidget : DropdownControlW
 	{
 		foundIndex = new();
 
-		foreach ( var entry in Node.Feature.Options.Index() )
+		foreach ( var entry in _featureEnumParameter.Options.Index() )
 		{
-			if ( entry.Item == selectedEntry.Label )
+			if ( entry.Item.Name == selectedEntry.Label )
 			{
 				foundIndex = entry.Index;
 
@@ -70,11 +69,11 @@ internal sealed class SGPFeatureEnumPreviewIndexControlWidget : DropdownControlW
 
 		if ( item is Entry e )
 		{
-			SelectedEntry = e;
+			_selectedEntry = e;
 
-			if ( TryGetyIndexFromEntry( SelectedEntry, out var newSelectedIndex ) )
+			if ( TryGetyIndexFromEntry( _selectedEntry, out var newSelectedIndex ) )
 			{
-				SelectedIndex = newSelectedIndex;
+				_selectedIndex = newSelectedIndex;
 			}
 		}
 	}
@@ -83,11 +82,11 @@ internal sealed class SGPFeatureEnumPreviewIndexControlWidget : DropdownControlW
 	{
 		List<object> list = new();
 
-		foreach ( var option in Node.Feature.Options.Index() )
+		foreach ( var option in _featureEnumParameter.Options.Index() )
 		{
 			var entry = new Entry();
 			entry.Value = option.Index;
-			entry.Label = option.Item;
+			entry.Label = option.Item.Name;
 			entry.Description = "";
 			list.Add( entry );
 		}
@@ -106,7 +105,7 @@ internal sealed class SGPFeatureEnumPreviewIndexControlWidget : DropdownControlW
 
 	protected override void PaintControl()
 	{
-		var entryLabel = SelectedEntry.Label; // at index {SelectedIndex}";
+		var entryLabel = _selectedEntry.Label; // at index {SelectedIndex}";
 		var color = IsControlHovered ? Theme.Blue : Theme.TextControl;
 		var rect = LocalRect;
 

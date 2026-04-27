@@ -16,7 +16,24 @@ public class ClassBlackboardParameterType : IBlackboardParameterType
 
 		if ( string.IsNullOrWhiteSpace( name ) )
 		{
-			var baseName = $"{(sg.IsSubgraph ? "SubgraphInput" : "MaterialParameter")}";
+			string baseName;
+			if ( sg.IsSubgraph )
+			{
+				baseName = "SubgraphInput";
+			}
+			else if ( Type.TargetType == typeof( ShaderFeatureBooleanParameter ) )
+			{
+				baseName = "FeatureBoolean";
+			}
+			else if ( Type.TargetType == typeof( ShaderFeatureEnumParameter ) )
+			{
+				baseName = "FeatureEnum";
+			}
+			else
+			{
+				baseName = "MaterialParameter";
+			}
+
 			var id = 0;
 			while ( sg.HasParameterWithName( $"{baseName}{id}" ) )
 			{
@@ -30,6 +47,12 @@ public class ClassBlackboardParameterType : IBlackboardParameterType
 		{
 			parameter.Name = name;
 			parameter.Graph = graph;
+
+			if ( parameter is ShaderFeatureEnumParameter shaderFeatureEnumParameter )
+			{
+				shaderFeatureEnumParameter.Options.Add( new ShaderFeatureEnumOption() { Name = "A" } );
+				shaderFeatureEnumParameter.Options.Add( new ShaderFeatureEnumOption() { Name = "B" } );
+			}
 
 			return parameter;
 		}

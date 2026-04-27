@@ -1,5 +1,3 @@
-using NodeEditorPlus;
-
 namespace ShaderGraphPlus.Nodes;
 
 [Title( "Boolean Combo Switch" ), Category( "Utility/Logic" ), Icon( "alt_route" )]
@@ -21,39 +19,43 @@ public sealed class BooleanFeatureSwitchNode : ShaderNodePlus, IParameterNode
 	[Hide, JsonIgnore, Browsable( false )]
 	public ShaderFeatureBoolean Feature => GetFeature();
 
-	[Input]
+	[Input, Hide]
 	[Title( "True" )]
-	[Hide]
 	public NodeInput InputTrue { get; set; }
 
-	[Input]
+	[Input, Hide]
 	[Title( "False" )]
-	[Hide]
 	public NodeInput InputFalse { get; set; }
 
-	[Title( "Preview" )]
-	public bool Preview { get; set; } = false;
-
-	private ShaderFeatureBoolean GetFeature()
+	private ShaderFeatureBooleanParameter GetFeatureParameter()
 	{
 		if ( Graph is ShaderGraphPlus graph )
 		{
 			var parameter = graph.FindParameter<ShaderFeatureBooleanParameter>( ParameterIdentifier );
 
-			if ( parameter.IsValid )
-			{
-				var featureBoolean = new ShaderFeatureBoolean
-				{
-					Name = parameter.Name,
-					Description = parameter.Description,
-					HeaderName = parameter.HeaderName,
-				};
-
-				return featureBoolean;
-			}
+			return parameter;
 		}
 
-		return null;
+		return new ShaderFeatureBooleanParameter();
+	}
+
+	private ShaderFeatureBoolean GetFeature()
+	{
+		var parameter = GetFeatureParameter();
+
+		if ( parameter.IsValid )
+		{
+			var featureBoolean = new ShaderFeatureBoolean
+			{
+				Name = parameter.Name,
+				Description = parameter.Description,
+				HeaderName = parameter.HeaderName,
+			};
+
+			return featureBoolean;
+		}
+
+		return new ShaderFeatureBoolean();
 	}
 
 	[Output, Hide]
@@ -65,7 +67,8 @@ public sealed class BooleanFeatureSwitchNode : ShaderNodePlus, IParameterNode
 			InputFalse
 		};
 
-		var result = compiler.ResultFeatureSwitch( inputs, Feature, Preview ? 1 : 0 );
+		var preview = GetFeatureParameter().Preview;
+		var result = compiler.ResultFeatureSwitch( inputs, Feature, preview ? 1 : 0 );
 
 		return result.IsValid ? result : new NodeResult( ResultType.Float, $"1.0f" );
 	};

@@ -1,4 +1,4 @@
-﻿using ShaderGraphPlus.Nodes;
+using ShaderGraphPlus.Nodes;
 using System.Text.Json.Nodes;
 
 namespace ShaderGraphPlus;
@@ -106,7 +106,6 @@ partial class ShaderGraphPlus
 			{
 				var propName = x.Name;
 
-
 				if ( x.GetCustomAttribute<JsonPropertyNameAttribute>() is JsonPropertyNameAttribute jpna )
 					propName = jpna.Name;
 
@@ -188,6 +187,12 @@ partial class ShaderGraphPlus
 				if ( identifiers != null && _nodes.ContainsKey( node.Identifier ) )
 				{
 					identifiers.Add( node.Identifier, node.NewIdentifier() );
+				}
+
+				// Hook up the graph to this node early so the connections are actually loaded and dont break on load.
+				if ( node is EnumFeatureSwitchNode )
+				{
+					node.Graph = this;
 				}
 
 				if ( node is BaseNodePlus.IInitializeNode initializeableNode )
