@@ -44,6 +44,21 @@ public partial class ShaderGraphPlus
 		return obj.TryGetPropertyValue( nameof( ShaderGraphPlus.IsSubgraph ), out var subgraphValue ) ? subgraphValue.GetValue<bool>() : false;
 	}
 
+	/// <summary>
+	/// Update existing Json key with new data
+	/// </summary>
+	private static void UpdateJsonKey<T>( JsonObject obj, string targetKey, T newValue )
+	{
+		if ( obj.Remove( targetKey ) )
+		{
+			obj[targetKey] = JsonSerializer.SerializeToNode<T>( newValue, SerializerOptions() );
+		}
+		else
+		{
+			throw new Exception( $"Cannot find key with the name : '{targetKey}'" );
+		}
+	}
+
 	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey )
 	{
 		if ( obj.ContainsKey( oldkey ) )
