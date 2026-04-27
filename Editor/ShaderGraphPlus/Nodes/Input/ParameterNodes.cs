@@ -50,7 +50,7 @@ public sealed class IntParameterNode : ParameterNode<int, IntParameter>
 [Hide]
 public sealed class FloatParameterNode : ParameterNode<float, FloatParameter>
 {
-	[Hide] public float Step => ((FloatParameterUI)GetParameter().UI).Step; //UI.Step;
+	[Hide] public float Step => GetParameter().UI.Step;
 
 	[Output( typeof( float ) ), Title( "Value" )]
 	[Hide, NodeValueEditor( nameof( Value ) ), Range( nameof( Min ), nameof( Max ), nameof( Step ) )]
