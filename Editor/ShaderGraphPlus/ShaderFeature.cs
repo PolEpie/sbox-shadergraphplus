@@ -53,7 +53,7 @@ public class ShaderFeatureBase : IValid
 	}
 }
 
-public class ShaderFeatureBoolean : ShaderFeatureBase
+public sealed class ShaderFeatureBoolean : ShaderFeatureBase
 {
 	[Hide, JsonIgnore, Browsable( false )]
 	public override bool IsValid => !string.IsNullOrWhiteSpace( Name );
@@ -102,7 +102,7 @@ public sealed class ShaderFeatureEnumOption : IValid
 	}
 }
 
-public class ShaderFeatureEnum : ShaderFeatureBase
+public sealed class ShaderFeatureEnum : ShaderFeatureBase
 {
 	[Hide, JsonIgnore, Browsable( false )]
 	public override bool IsValid => !string.IsNullOrWhiteSpace( Name ) && Options.All( x => !string.IsNullOrWhiteSpace( x.Name ) );
