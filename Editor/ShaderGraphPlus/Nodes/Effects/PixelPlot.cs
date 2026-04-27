@@ -2,7 +2,7 @@
 namespace ShaderGraphPlus.Nodes;
 
 /// <summary>
-/// Creates a 
+///
 /// </summary>
 [Title( "Pixel Plot" ), Category( "Effects" )]
 public sealed class PixelPlotNode : ShaderNodePlus
@@ -12,21 +12,24 @@ public sealed class PixelPlotNode : ShaderNodePlus
 
 	[Hide]
 	public string PixelPlot => @"	
-float4 PixelPlot( in Texture2D vColor, in SamplerState sSampler, float2 vUv , float2 vGridSize , float flBoarderThickness)
+float4 PixelPlot( in Texture2D vColorTex, in SamplerState sSampler, float2 vUv , float2 vGridSize , float flBoarderThickness)
 {
+	float2 vGridBlock = 1.0f / vGridSize;
+	float2 vUvGrid = floor( vUv * vGridSize ) / vGridSize; // Divide By Gridsize so that uvspace is clamped to  0 to 1.
+	float2 vGridBoarder = step( 0.5f - flBoarderThickness, frac( vUv / vGridBlock ) ) *
+						 step( frac( vUv / vGridBlock ), 0.5f + flBoarderThickness );
 
-	float2 vGridBlock = 1 / vGridSize;
-
-	float2 vUvGrid = floor(vUv * vGridSize) / vGridSize; // Divide By Gridsize so that uvspace is clamped to  0 to 1.
-
-	float2 vGridBoarder = step(0.5 - flBoarderThickness, frac(vUv / vGridBlock)) *
-						 step(frac(vUv / vGridBlock), 0.5 + flBoarderThickness);
-
-	float4 result = vColor.Sample(sSampler,vUvGrid) * (vGridBoarder.x * vGridBoarder.y);
-
-	return result;
+	return vColorTex.Sample( sSampler, vUvGrid ) * ( vGridBoarder.x * vGridBoarder.y );
 }
 ";
+
+	/// <summary>
+	/// Texture object to apply the effect to.
+	/// </summary>
+	[Title( "Texture2D" )]
+	[Input( typeof( Texture ) )]
+	[Hide]
+	public NodeInput Texture2D { get; set; }
 
 	/// <summary>
 	/// Coordinates to sample this texture
@@ -35,14 +38,6 @@ float4 PixelPlot( in Texture2D vColor, in SamplerState sSampler, float2 vUv , fl
 	[Input( typeof( Vector2 ) )]
 	[Hide]
 	public NodeInput Coords { get; set; }
-
-	/// <summary>
-	/// Texture object to apply the effect to.
-	/// </summary>
-	[Title( "TexObject" )]
-	[Input( typeof( Texture ) )]
-	[Hide]
-	public NodeInput Texture2D { get; set; }
 
 	/// <summary>
 	/// How the effect is filtered and wrapped when sampled
@@ -61,44 +56,41 @@ float4 PixelPlot( in Texture2D vColor, in SamplerState sSampler, float2 vUv , fl
 	public NodeInput BoarderThickness { get; set; }
 
 	[InlineEditor( Label = false ), Group( "Sampler" )]
+	[ShowIf( nameof( ShowDefaultSamplerState ), true )]
 	public Sampler SamplerState { get; set; } = new Sampler();
+
+	[InputDefault( nameof( GridSize ) )]
 	public Vector2 DefaultGridSize { get; set; } = new Vector2( 24.0f, 24.0f );
+
+	[InputDefault( nameof( BoarderThickness ) )]
 	public float DefaultBoarderThickness { get; set; } = 0.420f;
 
+	[JsonIgnore, Hide, Browsable( false )]
+	private bool ShowDefaultSamplerState { get; set; } = false;
 
-
-
-	public PixelPlotNode()
-	{
-		//ExpandSize = new Vector2( 0f, 12f );
-	}
-
-	/// <summary>
-	/// Pixel Plot effect result.
-	/// </summary>
-	[Hide]
 	[Output( typeof( Vector4 ) ), Title( "Result" )]
+	[Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		var textureobject = compiler.Result( Texture2D );
-		var coords = compiler.Result( Coords );
-		var Grid = compiler.ResultOrDefault( GridSize, DefaultGridSize );
-		var Boarder = compiler.ResultOrDefault( BoarderThickness, DefaultBoarderThickness );
+		var coordsResult = compiler.Result( Coords );
+		var textureResult = compiler.Result( Texture2D );
+		var samplerResult = compiler.ResultSamplerOrDefault( Sampler, SamplerState );
+		var gridResult = compiler.ResultOrDefault( GridSize, DefaultGridSize );
+		var boarderThicknessResult = compiler.ResultOrDefault( BoarderThickness, DefaultBoarderThickness );
 
-		if ( !textureobject.IsValid )
+		ShowDefaultSamplerState = !Sampler.IsValid;
+
+		if ( !textureResult.IsValid )
 		{
-			ErrorMessage = "Missing required input 'Texture2D'";
 			return NodeResult.MissingInput( "Texture2D" );
 		}
-		else if ( textureobject.ResultType is not ResultType.Texture2D )
+		else if ( textureResult.ResultType is not ResultType.Texture2D )
 		{
 			return NodeResult.Error( $"Input to TexObject is not a texture object!" );
 		}
 
-		ClearError();
-
 		string func = compiler.RegisterHLSLFunction( PixelPlot, "PixelPlot" );
-		string funcCall = compiler.ResultHLSLFunction( func, $"{textureobject}, {compiler.ResultSamplerOrDefault( Sampler, SamplerState )}, {(coords.IsValid ? $"{coords.Cast( 2 )}" : "i.vTextureCoords.xy")}, {Grid}, {Boarder}" );
+		string funcCall = compiler.ResultHLSLFunction( func, $"{textureResult}, {samplerResult}, {(coordsResult.IsValid ? $"{coordsResult.Cast( 2 )}" : "i.vTextureCoords.xy")}, {gridResult}, {boarderThicknessResult}" );
 
 		return new NodeResult( ResultType.Vector4, funcCall );
 	};
