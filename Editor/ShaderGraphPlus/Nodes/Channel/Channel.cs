@@ -297,7 +297,7 @@ public sealed class SwizzleVector : ShaderNodePlus
 /// <summary>
 /// Append constants to change number of channels
 /// </summary>
-[Title( "Append" ), Category( "Channel" )]
+[Title( "Append" ), Category( "Channel" ), Icon( "control_point" )]
 public sealed class AppendVector : ShaderNodePlus
 {
 	[JsonIgnore, Hide, Browsable( false )]
