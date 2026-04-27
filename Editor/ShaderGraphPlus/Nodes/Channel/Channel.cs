@@ -253,8 +253,11 @@ public sealed class SwizzleVector : ShaderNodePlus
 	[JsonIgnore, Hide, Browsable( false )]
 	public override Color NodeTitleColor => ShaderGraphPlusTheme.NodeHeaderColors.ChannelNode;
 
-	[Input, Hide]
+	[Input( typeof( Vector4 ) ), Hide]
 	public NodeInput Input { get; set; }
+
+	[InputDefault( nameof( Input ) )]
+	public Vector4 DefaultSwizzle { get; set; } = new Vector4( 1, 0, 1, 1 );
 
 	public SwizzleChannel RedOut { get; set; } = SwizzleChannel.Red;
 	public SwizzleChannel GreenOut { get; set; } = SwizzleChannel.Green;
@@ -275,9 +278,12 @@ public sealed class SwizzleVector : ShaderNodePlus
 	[Output( typeof( Vector4 ) ), Hide]
 	public NodeResult.Func Output => ( GraphCompiler compiler ) =>
 	{
-		var input = compiler.Result( Input );
+		var input = compiler.ResultOrDefault( Input, DefaultSwizzle );
+
 		if ( !input.IsValid )
-			return default;
+		{
+			return NodeResult.MissingInput( nameof( Input ) );
+		}
 
 		var swizzle = $".";
 		swizzle += SwizzleToChannel( RedOut );
