@@ -1008,6 +1008,35 @@ public sealed partial class GraphCompiler
 	/// <summary>
 	/// Get result of a value that can be set in material editor
 	/// </summary>
+	public NodeResult ResultParameter<T>( T parameter ) where T : IBlackboardParameter
+	{
+		var name = parameter.Name;
+		var value = parameter.GetValue();
+		object min = default;
+		object max = default;
+		var isRange = false;
+		var isAttribute = false;
+		IParameterUI parameterUI = default;
+
+		if ( parameter is IBlackboardMaterialParameter materialParameter )
+		{
+			isAttribute = materialParameter.IsAttribute;
+			parameterUI = materialParameter.GetParameterUI();
+		}
+
+		if ( parameter is IRangedBlackboardMaterialParameter rangedParameter )
+		{
+			min = rangedParameter.GetRangeMin();
+			max = rangedParameter.GetRangeMax();
+			isRange = min != max;
+		}
+
+		return ResultParameter( name, value, min, max, isRange, isAttribute, parameterUI );
+	}
+
+	/// <summary>
+	/// Get result of a value that can be set in material editor
+	/// </summary>
 	public NodeResult ResultParameter<T>( string name, T value, T min = default, T max = default, bool isRange = false, bool isAttribute = false, IParameterUI ui = default )
 	{
 		if ( IsPreview || string.IsNullOrWhiteSpace( name ) || Subgraph is not null )
