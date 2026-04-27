@@ -4,7 +4,7 @@ namespace ShaderGraphPlus.Nodes;
 /// <summary>
 /// Gerstner Waves
 /// </summary>
-[Title( "Gerstner Waves" ), Category( "Effects" )]
+[Title( "Gerstner Waves" ), Category( "Effects" ), Icon( "waves" )]
 public sealed class GerstnerWavesNode : ShaderNodePlus
 {
 	[JsonIgnore, Hide, Browsable( false )]
