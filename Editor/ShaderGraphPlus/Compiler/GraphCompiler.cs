@@ -331,14 +331,14 @@ public sealed partial class GraphCompiler
 		list.Add( path );
 	}
 
-	public string RegisterDefine( string name, string define )
+	public string RegisterDefine( string name, string value )
 	{
 		name = CleanName( name );
 
 		if ( ShaderDefines.ContainsKey( name ) )
 			return name.ToUpper();
 
-		ShaderDefines.Add( name, define );
+		ShaderDefines.Add( name, value );
 
 		return name.ToUpper();
 	}
