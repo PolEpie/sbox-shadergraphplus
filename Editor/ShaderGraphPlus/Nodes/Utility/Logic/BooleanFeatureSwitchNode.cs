@@ -6,23 +6,20 @@ namespace ShaderGraphPlus.Nodes;
 [InternalNode]
 public sealed class BooleanFeatureSwitchNode : ShaderNodePlus, IParameterNode
 {
-	[Hide]
-	public string Name => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
-
-	[Hide]
-	public override string Title
-	{
-		get
-		{
-			return $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
-		}
-	}
-
 	[Hide, JsonIgnore, Browsable( false )]
 	public override Color NodeTitleColor { get; set; } = ShaderGraphPlusTheme.NodeHeaderColors.LogicNode;
 
-	[Hide, Browsable( false )]
+	[Hide, JsonIgnore, Browsable( false )]
+	public override string Title => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
+
+	[Hide, JsonIgnore, Browsable( false )]
+	public string Name => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
+
+	[Hide, JsonIgnore, Browsable( false )]
 	public Guid ParameterIdentifier { get; set; }
+
+	[Hide, JsonIgnore, Browsable( false )]
+	public ShaderFeatureBoolean Feature => GetFeature();
 
 	[Input]
 	[Title( "True" )]
@@ -34,11 +31,30 @@ public sealed class BooleanFeatureSwitchNode : ShaderNodePlus, IParameterNode
 	[Hide]
 	public NodeInput InputFalse { get; set; }
 
-	[Hide]
-	public ShaderFeatureBoolean Feature { get; set; } = new();
-
 	[Title( "Preview" )]
 	public bool Preview { get; set; } = false;
+
+	private ShaderFeatureBoolean GetFeature()
+	{
+		if ( Graph is ShaderGraphPlus graph )
+		{
+			var parameter = graph.FindParameter<ShaderFeatureBooleanParameter>( ParameterIdentifier );
+
+			if ( parameter.IsValid )
+			{
+				var featureBoolean = new ShaderFeatureBoolean
+				{
+					Name = parameter.Name,
+					Description = parameter.Description,
+					HeaderName = parameter.HeaderName,
+				};
+
+				return featureBoolean;
+			}
+		}
+
+		return null;
+	}
 
 	[Output, Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
@@ -53,20 +69,4 @@ public sealed class BooleanFeatureSwitchNode : ShaderNodePlus, IParameterNode
 
 		return result.IsValid ? result : new NodeResult( ResultType.Float, $"1.0f" );
 	};
-
-	public void UpdateFromBlackboard( BlackboardParameter parameter )
-	{
-		if ( parameter is ShaderFeatureBooleanParameter boolFeatureParam )
-		{
-			if ( boolFeatureParam.IsValid )
-			{
-				Feature = new ShaderFeatureBoolean
-				{
-					Name = boolFeatureParam.Name,
-					Description = boolFeatureParam.Description,
-					HeaderName = boolFeatureParam.HeaderName,
-				};
-			}
-		}
-	}
 }

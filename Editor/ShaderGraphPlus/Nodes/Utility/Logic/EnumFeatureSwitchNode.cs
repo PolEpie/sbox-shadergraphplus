@@ -6,26 +6,20 @@ namespace ShaderGraphPlus.Nodes;
 [InternalNode]
 public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitializeNode, IParameterNode, IErroringNode
 {
-	[Hide]
-	public string Name => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
-
-	[Hide]
-	public override string Title
-	{
-		get
-		{
-			return $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
-		}
-	}
-
 	[Hide, JsonIgnore, Browsable( false )]
 	public override Color NodeTitleColor { get; set; } = ShaderGraphPlusTheme.NodeHeaderColors.LogicNode;
 
-	[Hide, Browsable( false )]
+	[Hide, JsonIgnore, Browsable( false )]
+	public override string Title => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
+
+	[Hide, JsonIgnore, Browsable( false )]
+	public string Name => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
+
+	[Hide, JsonIgnore, Browsable( false )]
 	public Guid ParameterIdentifier { get; set; }
 
-	[Hide]
-	public ShaderFeatureEnum Feature { get; set; } = new();
+	[Hide, JsonIgnore, Browsable( false )]
+	public ShaderFeatureEnum Feature => GetFeature();
 
 	[global::Editor( ControlWidgetCustomEditors.ShaderFeatureEnumPreviewIndexEditor )]
 	[Title( "Preview" )]
@@ -60,6 +54,29 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 				Update();
 			}
 		}
+	}
+
+	private ShaderFeatureEnum GetFeature()
+	{
+		if ( Graph is ShaderGraphPlus graph )
+		{
+			var parameter = graph.FindParameter<ShaderFeatureEnumParameter>( ParameterIdentifier );
+
+			if ( parameter.IsValid )
+			{
+				var featureEnum = new ShaderFeatureEnum
+				{
+					Name = parameter.Name,
+					Description = parameter.Description,
+					HeaderName = parameter.HeaderName,
+					Options = parameter.Options,
+				};
+
+				return featureEnum;
+			}
+		}
+
+		return null;
 	}
 
 	[Output, Hide]
@@ -142,30 +159,6 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 			}
 
 			InternalInputs = inPlugs;
-		}
-	}
-
-	public void UpdateFromBlackboard( BlackboardParameter parameter )
-	{
-		if ( parameter is ShaderFeatureEnumParameter enumFeatureParam )
-		{
-			if ( enumFeatureParam.IsValid )
-			{
-				Feature = new ShaderFeatureEnum
-				{
-					Name = enumFeatureParam.Name,
-					Description = enumFeatureParam.Description,
-					HeaderName = enumFeatureParam.HeaderName,
-					Options = enumFeatureParam.Options,
-				};
-
-				//_hasFeatureError = false;
-			}
-			else
-			{
-				//_hasFeatureError = true;
-			}
-
 		}
 	}
 
