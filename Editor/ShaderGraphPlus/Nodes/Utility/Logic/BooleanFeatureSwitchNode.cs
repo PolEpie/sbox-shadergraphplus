@@ -15,7 +15,7 @@ public sealed class BooleanFeatureSwitchNode : ShaderNodePlus, IParameterNode
 	[Hide, JsonIgnore, Browsable( false )]
 	public string Name => $"F_{Feature.Name.ToUpper().Replace( " ", "_" )}";
 
-	[Hide, JsonIgnore, Browsable( false )]
+	[Hide, Browsable( false )]
 	public Guid ParameterIdentifier { get; set; }
 
 	[Hide, JsonIgnore, Browsable( false )]
