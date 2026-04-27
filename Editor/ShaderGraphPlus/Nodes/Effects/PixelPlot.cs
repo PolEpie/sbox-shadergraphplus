@@ -4,7 +4,7 @@ namespace ShaderGraphPlus.Nodes;
 /// <summary>
 ///
 /// </summary>
-[Title( "Pixel Plot" ), Category( "Effects" )]
+[Title( "Pixel Plot" ), Category( "Effects" ), Icon( "grid_on" )]
 public sealed class PixelPlotNode : ShaderNodePlus
 {
 	[JsonIgnore, Hide, Browsable( false )]
