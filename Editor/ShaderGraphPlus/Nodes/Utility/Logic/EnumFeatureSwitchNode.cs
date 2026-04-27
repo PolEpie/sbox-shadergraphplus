@@ -1,5 +1,3 @@
-using static ShaderGraphPlus.ShaderGraphPlusGlobals;
-
 namespace ShaderGraphPlus.Nodes;
 
 [Title( "Enum Combo Switch" ), Category( "Utility/Logic" ), Icon( "alt_route" )]
