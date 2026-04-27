@@ -59,8 +59,8 @@ public sealed class MathConstantsNode : ShaderNodePlus
 	[Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		var defineValue = compiler.RegisterDefine( $"SGP_M_{Constant}", ConstantResult );
+		var define = compiler.RegisterDefine( $"SGP_M_{Constant}", ConstantResult );
 
-		return new NodeResult( ResultType.Float, defineValue, constant : true );
+		return new NodeResult( ResultType.Float, define, constant : true );
 	};
 }
