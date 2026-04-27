@@ -331,6 +331,9 @@ public sealed partial class GraphCompiler
 		list.Add( path );
 	}
 
+	/// <summary>
+	/// Register a hlsl define directive and then return the name of the define converted to all uppercase.
+	/// </summary>
 	public string RegisterDefine( string name, string value )
 	{
 		name = CleanName( name );
