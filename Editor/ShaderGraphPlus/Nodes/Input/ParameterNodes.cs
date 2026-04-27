@@ -11,7 +11,7 @@ public sealed class BoolParameterNode : ParameterNode<bool, BoolParameter>
 	[Hide, NodeValueEditor( nameof( Value ) )]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, default, default, false, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	public BoolParameterNode()
@@ -32,7 +32,7 @@ public sealed class IntParameterNode : ParameterNode<int, IntParameter>
 	[Hide, NodeValueEditor( nameof( Value ) ), Range( nameof( Min ), nameof( Max ), nameof( Step ) )]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, Min, Max, Min != Max, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	[Hide] public int Min => GetParameter().Min;
@@ -56,7 +56,7 @@ public sealed class FloatParameterNode : ParameterNode<float, FloatParameter>
 	[Hide, NodeValueEditor( nameof( Value ) ), Range( nameof( Min ), nameof( Max ), nameof( Step ) )]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, Min, Max, Min != Max, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	[Hide] public float Min => GetParameter().Min;
@@ -77,7 +77,7 @@ public sealed class Float2ParameterNode : ParameterNode<Vector2, Float2Parameter
 	[Output( typeof( Vector2 ) ), Title( "XY" ), Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, Min, Max, Min != Max, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	[Hide] public Vector2 Min => GetParameter().Min;
@@ -133,7 +133,7 @@ public sealed class Float3ParameterNode : ParameterNode<Vector3, Float3Parameter
 	[Output( typeof( Vector3 ) ), Title( "XYZ" ), Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, Min, Max, Min != Max, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	[Hide] public Vector3 Min => GetParameter().Min;
@@ -205,7 +205,7 @@ public sealed class Float4ParameterNode : ParameterNode<Vector4, Float4Parameter
 	[Output( typeof( Vector4 ) ), Title( "XYZW" ), Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, default, default, false, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	[Hide] public Vector4 Min => GetParameter().Min;
@@ -294,7 +294,7 @@ public sealed class ColorParameterNode : ParameterNode<Color, ColorParameter>
 	[Hide, NodeValueEditor( nameof( Value ) )]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		return compiler.ResultParameter( GetParameter().Name, Value, default, default, false, GetParameter().IsAttribute, GetParameter().UI );
+		return compiler.ResultParameter( GetParameter() );
 	};
 
 	public ColorParameterNode()
