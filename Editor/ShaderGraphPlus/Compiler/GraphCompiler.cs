@@ -624,19 +624,6 @@ public sealed partial class GraphCompiler
 			}
 		}
 
-		// Nodes that just make use of Metadata in NodeResult.Metadata
-		if ( node is not SubgraphInput && node is IMetaDataNode metaDataNode )
-		{
-			var metaDataResult = metaDataNode.GetResult( this );
-
-			if ( metaDataResult.IsValid )
-			{
-				InputStack.Remove( input );
-
-				return metaDataResult;
-			}
-		}
-
 		if ( node is CustomFunctionNode customFunctionNode )
 		{
 			node.ClearError();

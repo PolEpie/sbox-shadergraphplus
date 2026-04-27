@@ -1,14 +1,6 @@
 ﻿namespace ShaderGraphPlus.Nodes;
 
 /// <summary>
-/// Node that can return any generic data.
-/// </summary>
-internal interface IMetaDataNode
-{
-	NodeResult GetResult( GraphCompiler compiler );
-}
-
-/// <summary>
 /// Bool value
 /// </summary>
 [Title( "Bool" ), Category( "Parameters" ), Icon( "check_box" ), Order( 0 )]
