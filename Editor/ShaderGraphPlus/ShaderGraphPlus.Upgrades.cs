@@ -43,4 +43,37 @@ public partial class ShaderGraphPlus
 	{
 		return obj.TryGetPropertyValue( nameof( ShaderGraphPlus.IsSubgraph ), out var subgraphValue ) ? subgraphValue.GetValue<bool>() : false;
 	}
+
+	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey )
+	{
+		if ( obj.ContainsKey( oldkey ) )
+		{
+			var jsonNode = obj[oldkey].DeepClone();
+
+			obj.Remove( oldkey );
+			obj[newKey] = jsonNode;
+		}
+		else
+		{
+			throw new Exception( $"Cannot find key with the name : '{oldkey}'" );
+		}
+	}
+
+	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey, bool condition )
+	{
+		if ( obj.ContainsKey( oldkey ) )
+		{
+			var jsonNode = obj[oldkey].DeepClone();
+
+			if ( condition )
+			{
+				obj.Remove( oldkey );
+				obj[newKey] = jsonNode;
+			}
+		}
+		else
+		{
+			throw new Exception( $"Cannot find key with the name : '{oldkey}'" );
+		}
+	}
 }

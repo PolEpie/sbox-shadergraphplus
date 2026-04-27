@@ -79,37 +79,4 @@ public partial class ShaderGraphPlus
 		obj.Remove( JsonKeys.NodeArray );
 		obj.Add( JsonKeys.NodeArray, newNodeArray );
 	}
-
-	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey )
-	{
-		if ( obj.ContainsKey( oldkey ) )
-		{
-			var jsonNode = obj[oldkey].DeepClone();
-
-			obj.Remove( oldkey );
-			obj[newKey] = jsonNode;
-		}
-		else
-		{
-			throw new Exception( $"Cannot find key with the name : '{oldkey}'" );
-		}
-	}
-
-	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey, bool condition )
-	{
-		if ( obj.ContainsKey( oldkey ) )
-		{
-			var jsonNode = obj[oldkey].DeepClone();
-
-			if ( condition )
-			{
-				obj.Remove( oldkey );
-				obj[newKey] = jsonNode;
-			}
-		}
-		else
-		{
-			throw new Exception( $"Cannot find key with the name : '{oldkey}'" );
-		}
-	}
 }
