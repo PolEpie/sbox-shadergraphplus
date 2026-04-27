@@ -59,6 +59,21 @@ public partial class ShaderGraphPlus
 		}
 	}
 
+	/// <summary>
+	/// Update existing Json key with new data
+	/// </summary>
+	private static void UpdateJsonKey<T>( JsonObject obj, string targetKey, T newValue, T defaultValue )
+	{
+		if ( obj.Remove( targetKey ) )
+		{
+			obj[targetKey] = JsonSerializer.SerializeToNode<T>( newValue, SerializerOptions() );
+		}
+		else
+		{
+			obj[targetKey] = JsonSerializer.SerializeToNode<T>( defaultValue, SerializerOptions() );
+		}
+	}
+
 	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey )
 	{
 		if ( obj.ContainsKey( oldkey ) )
