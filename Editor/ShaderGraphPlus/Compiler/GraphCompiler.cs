@@ -61,6 +61,8 @@ public sealed partial class GraphCompiler
 	/// </summary>
 	public Dictionary<string, string> PixelInputs { get; private set; } = new();
 
+	public Dictionary<string, string> ShaderDefines { get; private set; } = new();
+
 	public int VoidLocalCount { get; set; } = 0;
 
 	/// <summary>
@@ -327,6 +329,18 @@ public sealed partial class GraphCompiler
 			return;
 
 		list.Add( path );
+	}
+
+	public string RegisterDefine( string name, string define )
+	{
+		name = CleanName( name );
+
+		if ( ShaderDefines.ContainsKey( name ) )
+			return name.ToUpper();
+
+		ShaderDefines.Add( name, define );
+
+		return name.ToUpper();
 	}
 
 	/// <summary>
@@ -1666,6 +1680,19 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 		sb.AppendLine();
 
 		sb.Append( $"#define S_UV2 1" );
+
+		if ( ShaderDefines.Any() )
+		{
+			sb.AppendLine();
+			sb.AppendLine();
+
+			foreach ( var define in ShaderDefines )
+			{
+				sb.AppendLine( $"#ifndef {define.Key.ToUpper()}" );
+				sb.AppendLine( IndentString( $"#define {define.Key.ToUpper()} {define.Value}", 1 ) );
+				sb.AppendLine( $"#endif" );
+			}
+		}
 
 		return sb.ToString();
 	}
