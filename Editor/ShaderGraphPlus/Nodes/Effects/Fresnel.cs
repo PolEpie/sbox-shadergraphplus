@@ -4,7 +4,7 @@ namespace ShaderGraphPlus.Nodes;
 /// <summary>
 /// Calculates a Fresnel term.
 /// </summary>
-[Title( "Fresnel" ), Category( "Effects" )]
+[Title( "Fresnel" ), Category( "Effects" ), Icon( "blur_circular" )]
 public sealed class Fresnel : ShaderNodePlus
 {
 	[JsonIgnore, Hide, Browsable( false )]
