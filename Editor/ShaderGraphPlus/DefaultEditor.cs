@@ -44,6 +44,7 @@ public class DefaultEditor : ValueEditor
 	{
 		if ( !Enabled ) return;
 		if ( Plug is null ) return;
+		if ( Plug.IsConnected ) return;
 		if ( Plug?.Node?.Node is not ShaderNodePlus node ) return;
 		if ( Plug.Inner is IPlugOut plugOut ) return;
 		if ( Plug.Inner is IPlugIn plugIn )
