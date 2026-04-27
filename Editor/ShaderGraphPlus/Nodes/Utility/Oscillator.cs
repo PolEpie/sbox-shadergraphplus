@@ -11,13 +11,13 @@ public sealed class OscillatorNode : ShaderNodePlus
 	public string Oscillator => @"
 float Oscillator( float flTime, float flFrequency, float flPhase, float flStrength )
 {
-	float period, amplitude, currentPhase;
+	float amplitude;
 
-	if(flFrequency > 0.0001f)
+	if( flFrequency > 0.0001f )
 	{
-		period = 1.0f/flFrequency;
-		currentPhase = (fmod(flTime, period)*flFrequency) + flPhase/255.0f;
-		amplitude = flStrength * sin(currentPhase * 3.1415926535897932f * 2.0f);
+		float period = 1.0f / flFrequency;
+		float currentPhase = ( fmod( flTime, period ) * flFrequency ) + flPhase / 255.0f;
+		amplitude = flStrength * sin( currentPhase * 3.1415926535897932f * 2.0f );
 	}
 	else
 	{
@@ -44,31 +44,26 @@ float Oscillator( float flTime, float flFrequency, float flPhase, float flStreng
 	[Hide]
 	public NodeInput Strength { get; set; }
 
+	[InputDefault( nameof( Frequency ) )]
 	public float DefaultFrequency { get; set; } = 1.0f;
+
+	[InputDefault( nameof( Phase ) )]
 	public float DefaultPhase { get; set; } = 0.0f;
+
+	[InputDefault( nameof( Strength ) )]
 	public float DefaultStrength { get; set; } = 10.0f;
 
 	[Output( typeof( float ) )]
 	[Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
-		var frequency = compiler.ResultOrDefault( Frequency, DefaultFrequency );
-		var phase = compiler.ResultOrDefault( Phase, DefaultPhase );
-		var strength = compiler.ResultOrDefault( Strength, DefaultStrength );
-		var result_time = compiler.Result( Time );
-		var time = "";
+		var timeResult = compiler.Result( Time );
+		var frequencyResult = compiler.ResultOrDefault( Frequency, DefaultFrequency );
+		var phaseResult = compiler.ResultOrDefault( Phase, DefaultPhase );
+		var strengthResult = compiler.ResultOrDefault( Strength, DefaultStrength );
 
-		if ( Time.IsValid() )
-		{
-			time = result_time.Code;
-		}
-		else
-		{
-			time = "g_flTime";
-		}
-
-		string func = compiler.RegisterHLSLFunction( Oscillator, "Oscillator" );
-		string funcCall = compiler.ResultHLSLFunction( func, $"{time}, {frequency}, {phase}, {strength}" );
+		var func = compiler.RegisterHLSLFunction( Oscillator, "Oscillator" );
+		var funcCall = compiler.ResultHLSLFunction( func, $"{(Time.IsValid() ? timeResult.Code : "g_flTime")}, {frequencyResult}, {phaseResult}, {strengthResult}" );
 
 		return new NodeResult( ResultType.Float, funcCall );
 	};
