@@ -336,14 +336,14 @@ public sealed partial class GraphCompiler
 	/// </summary>
 	public string RegisterDefine( string name, string value )
 	{
-		name = CleanName( name );
+		name = CleanName( name ).ToUpper();
 
 		if ( ShaderDefines.ContainsKey( name ) )
-			return name.ToUpper();
+			return name;
 
 		ShaderDefines.Add( name, value );
 
-		return name.ToUpper();
+		return name;
 	}
 
 	/// <summary>
@@ -1691,8 +1691,8 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 
 			foreach ( var define in ShaderDefines )
 			{
-				sb.AppendLine( $"#ifndef {define.Key.ToUpper()}" );
-				sb.AppendLine( IndentString( $"#define {define.Key.ToUpper()} {define.Value}", 1 ) );
+				sb.AppendLine( $"#ifndef {define.Key}" );
+				sb.AppendLine( IndentString( $"#define {define.Key} {define.Value}", 1 ) );
 				sb.AppendLine( $"#endif" );
 			}
 		}
