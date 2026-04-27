@@ -36,7 +36,7 @@ public sealed class Fresnel : ShaderNodePlus
 	/// </summary>
 	public float DefaultPower { get; set; } = 10.0f;
 
-	[Output( typeof( float ) )]
+	[Output( typeof( Vector3 ) )]
 	[Hide]
 	public NodeResult.Func Result => ( GraphCompiler compiler ) =>
 	{
