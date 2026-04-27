@@ -8,7 +8,7 @@ public enum SwizzleChannel
 	Alpha = 3,
 }
 
-[Title( "Component Mask" ), Category( "Channel" ), Icon( "call_split" )]
+[Title( "Component Mask" ), Category( "Channel" ), Icon( "theater_comedy" )]
 public sealed class ComponentMask : ShaderNodePlus
 {
 	[JsonIgnore, Hide, Browsable( false )]
@@ -133,7 +133,6 @@ public sealed class ComponentMask : ShaderNodePlus
 		}
 	};
 }
-
 
 /// <summary>
 /// Split value into individual components
