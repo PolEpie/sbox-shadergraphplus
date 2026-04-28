@@ -23,17 +23,21 @@
   "nodes": [
     {
       "_class": "SubgraphOutput",
-      "OutputIdentifier": "56022ee5-9c59-48c1-8458-52c33c32d8cc",
-      "OutputName": "Output0",
-      "OutputDescription": "",
-      "OutputType": "Vector3",
-      "Preview": "None",
-      "PortOrder": 0,
+      "ParameterIdentifier": "56022ee5-9c59-48c1-8458-52c33c32d8cc",
       "Identifier": "0",
       "Position": "0,0",
       "HandleOffsets": {}
     }
   ],
-  "parameters": [],
-  "__version": 6
+  "parameters": [
+    {
+      "_class": "Float3SubgraphOutputParameter",
+      "Name": "SubgraphOutput0",
+      "OutputDescription": "",
+      "PortOrder": 0,
+      "Preview": "Albedo",
+      "Identifier": "56022ee5-9c59-48c1-8458-52c33c32d8cc"
+    }
+  ],
+  "__version": 7
 }
