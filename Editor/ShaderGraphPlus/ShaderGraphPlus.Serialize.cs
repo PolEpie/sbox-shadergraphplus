@@ -189,8 +189,8 @@ partial class ShaderGraphPlus
 					identifiers.Add( node.Identifier, node.NewIdentifier() );
 				}
 
-				// Hook up the graph to this node early so the connections are actually loaded and dont break on load.
-				if ( node is EnumFeatureSwitchNode )
+				// Early case to hook up the graph to node early so that the connections are actually loaded and dont break on load.
+				if ( node is EnumFeatureSwitchNode || node is SubgraphOutput )
 				{
 					node.Graph = this;
 				}

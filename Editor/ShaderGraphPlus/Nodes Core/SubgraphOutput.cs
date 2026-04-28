@@ -112,7 +112,12 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 	private void CreateInput()
 	{
-		var Plugs = new List<IPlugIn>();
+		var plugs = new List<IPlugIn>();
+
+		var parameter = GetParameter();
+
+		if ( !parameter.IsValid )
+			return;
 
 		var type = OutputType switch
 		{
@@ -135,18 +140,19 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 		var info = new PlugInfo()
 		{
-			Id = ParameterIdentifier,
-			Name = OutputName,
+			Id = parameter.Identifier,
+			Name = parameter.Name,
 			Type = type,
 			DisplayInfo = new()
 			{
-				Name = OutputName,
+				Name = parameter.Name,
 				Fullname = type.FullName,
-				Description = OutputDescription,
+				Description = parameter.OutputDescription,
 			}
 		};
 
 		var plug = new BasePlugIn( this, info, info.Type );
+		//var oldPlug = InternalInputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Name == info.Name ) as BasePlugIn;
 		var oldPlug = InternalInputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Id == info.Id ) as BasePlugIn;
 		if ( oldPlug is not null )
 		{
@@ -154,23 +160,21 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 			oldPlug.Info.Type = type;
 			oldPlug.Info.DisplayInfo = info.DisplayInfo;
 
-			// Change the old plug type to the new type.
-			var oldplugType = oldPlug as IPlugIn;
-			oldplugType.Type = type;
-
-			Plugs.Add( oldplugType );
+			if ( oldPlug.Type != plug.Type )
+			{
+				plugs.Add( plug );
+			}
+			else
+			{
+				plugs.Add( oldPlug );
+			}
 		}
 		else
 		{
-			Plugs.Add( plug );
+			plugs.Add( plug );
 		}
 
-		InternalInputs = Plugs;
-	}
-
-	public void SetSubgraphPortTypeFromType( Type type )
-	{
-		// TODO
+		InternalInputs = plugs;
 	}
 
 	public void AddMaterialOutput( GraphCompiler compiler, StringBuilder sb, SubgraphOutputPreviewType previewType, out List<string> errors )
@@ -279,6 +283,10 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 						Identifier = plugIn.Info.ConnectedPlug.Node.Identifier,
 						Output = plugIn.Info.ConnectedPlug.Identifier
 					};
+				}
+				else
+				{
+					SGPLogger.Warning( $"Missing Inputernal Input : {plugIn.DisplayInfo.Name}" );
 				}
 
 				return plugIn.Info.GetInput( plugIn.Node );

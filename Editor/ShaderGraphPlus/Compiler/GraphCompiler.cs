@@ -770,7 +770,43 @@ public sealed partial class GraphCompiler
 			}
 			else
 			{
-				value = GetDefaultValue( subgraphNode, input.Output, resultInput.Type );
+
+				//value = GetDefaultValue( subgraphNode, input.Output, resultInput.Type );
+
+				switch ( resultNode.OutputType )
+				{
+					case SubgraphPortType.Bool:
+						value = false;
+						break;
+					case SubgraphPortType.Int:
+						value = 1;
+						break;
+					case SubgraphPortType.Float:
+						value = 1;
+						break;
+					case SubgraphPortType.Vector2:
+						value = Vector2.One;
+						break;
+					case SubgraphPortType.Vector3:
+						value = Vector3.One;
+						break;
+					case SubgraphPortType.Vector4:
+						value = Vector4.One;
+						break;
+					case SubgraphPortType.Color:
+						value = Color.White;
+						break;
+				}
+
+				if ( value != null )
+				{
+					Log.Error( $"Missing Internal Input \'{resultInput.DisplayInfo.Name}\' in node \'{Subgraph.Path}\' falling back to default value \'{value}\'" );
+				}
+				else
+				{
+					Log.Error( $"Missing Internal Input \'{resultInput.DisplayInfo.Name}\' in node \'{Subgraph.Path}\'" );
+				}
+
 				SubgraphStack.RemoveAt( SubgraphStack.Count - 1 );
 				Subgraph = newStack.Item2;
 				SubgraphNode = lastNode;

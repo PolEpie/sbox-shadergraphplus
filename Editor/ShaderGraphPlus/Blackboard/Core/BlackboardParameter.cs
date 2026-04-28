@@ -51,6 +51,8 @@ public interface IBlackboardSubgraphInputParameter : IBlackboardParameter
 
 public interface IBlackboardSubgraphOutputParameter : IBlackboardParameter
 {
+	bool IsValid { get; }
+
 	/// <summary>
 	/// Description of what this output does
 	/// </summary>
