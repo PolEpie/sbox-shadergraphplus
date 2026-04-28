@@ -8,6 +8,8 @@ public interface IBlackboardParameter
 {
 	Guid Identifier { get; }
 
+	DisplayInfo DisplayInfo { get; }
+
 	string Name { get; set; }
 
 	object GetValue();
@@ -47,6 +49,25 @@ public interface IBlackboardSubgraphInputParameter : IBlackboardParameter
 	abstract SubgraphPortType InputType { get; }
 }
 
+public interface IBlackboardSubgraphOutputParameter : IBlackboardParameter
+{
+	/// <summary>
+	/// Description of what this output does
+	/// </summary>
+	string OutputDescription { get; set; }
+
+	SubgraphOutputPreviewType Preview { get; set; }
+
+	/// <summary>
+	/// The order of this output port.
+	/// </summary>
+	int PortOrder { get; set; }
+
+	abstract SubgraphPortType OutputType { get; }
+
+	bool CannotPreviewOutputType { get; }
+}
+
 public interface IBlackboardParameterType
 {
 	public TypeDescription Type { get; }
@@ -72,6 +93,9 @@ public abstract class BlackboardParameter : IBlackboardParameter, IValid
 		}
 	}
 
+	[JsonIgnore, Hide, Browsable( false )]
+	public DisplayInfo DisplayInfo { get; }
+
 	[Hide, JsonIgnore, Browsable( false )]
 	public virtual bool IsValid => true;
 
@@ -79,7 +103,9 @@ public abstract class BlackboardParameter : IBlackboardParameter, IValid
 
 	public BlackboardParameter()
 	{
+		DisplayInfo = DisplayInfo.For( this );
 		NewIdentifier();
+
 		Name = "";
 	}
 
@@ -167,6 +193,22 @@ public abstract class BlackboardParameter : IBlackboardParameter, IValid
 				if ( !isSubgraph && targetType == typeof( Float4x4SubgraphInputParameter ) ) return false;
 				if ( !isSubgraph && targetType == typeof( GradientSubgraphInputParameter ) ) return false;
 				if ( !isSubgraph && targetType == typeof( SamplerStateSubgraphInputParameter ) ) return false;
+
+				// Only show subgraph output parameters when in a subgraph
+				if ( !isSubgraph && targetType == typeof( BoolSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( IntSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( FloatSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Float2SubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Float3SubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Float4SubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( ColorSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Texture2DSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( TextureCubeSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Float2x2SubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Float3x3SubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( Float4x4SubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( GradientSubgraphOutputParameter ) ) return false;
+				if ( !isSubgraph && targetType == typeof( SamplerStateSubgraphOutputParameter ) ) return false;
 			}
 
 			return true;
@@ -177,7 +219,7 @@ public abstract class BlackboardParameter : IBlackboardParameter, IValid
 	{
 		return parameter switch
 		{
-			// Not In Subgraph
+			// Material Parameters
 			BoolParameter => new BoolParameterNode()
 			{
 				ParameterIdentifier = parameter.Identifier,
@@ -223,7 +265,7 @@ public abstract class BlackboardParameter : IBlackboardParameter, IValid
 				ParameterIdentifier = parameter.Identifier,
 			},
 
-			// In Subgraph
+			// Subgraph Inputs
 			BoolSubgraphInputParameter => new SubgraphInput()
 			{
 				DefaultValue = false,
@@ -295,7 +337,63 @@ public abstract class BlackboardParameter : IBlackboardParameter, IValid
 				ParameterIdentifier = parameter.Identifier,
 			},
 
-
+			// Subgraph Outputs
+			BoolSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			IntSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			FloatSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Float2SubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Float3SubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Float4SubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			ColorSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Float2x2SubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Float3x3SubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Float4x4SubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			Texture2DSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			TextureCubeSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			SamplerStateSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
+			GradientSubgraphOutputParameter => new SubgraphOutput()
+			{
+				ParameterIdentifier = parameter.Identifier,
+			},
 			_ => throw new NotImplementedException( $"Unknown parameter : {parameter.GetType()}" ),
 		};
 	}
@@ -382,6 +480,60 @@ public abstract class BlackboardSubgraphInputParameter<T> : BlackboardParameter,
 		}
 
 		Value = (T)value;
+	}
+}
+
+public abstract class BlackboardSubgraphOutputParameter<T> : BlackboardParameter, IBlackboardSubgraphOutputParameter
+{
+	[Title( "Output Name" )]
+	public override string Name { get; set; }
+
+	/// <summary>
+	/// Description of what this output does
+	/// </summary>
+	[TextArea]
+	public string OutputDescription { get; set; } = "";
+
+	/// <summary>
+	/// The order of this output port
+	/// </summary>
+	[Title( "Order" )]
+	public int PortOrder { get; set; } = 0;
+
+	[Hide, JsonIgnore]
+	public abstract SubgraphPortType OutputType { get; }
+
+	[HideIf( nameof( CannotPreviewOutputType ), true )]
+	public SubgraphOutputPreviewType Preview { get; set; }
+
+	[JsonIgnore, Hide, Browsable( false )]
+	public bool CannotPreviewOutputType
+	{
+		get
+		{
+			return (OutputType == SubgraphPortType.Bool ||
+				OutputType == SubgraphPortType.Float2x2 ||
+				OutputType == SubgraphPortType.Float3x3 ||
+				OutputType == SubgraphPortType.Float4x4 ||
+				OutputType == SubgraphPortType.Gradient ||
+				OutputType == SubgraphPortType.Texture2DObject ||
+				OutputType == SubgraphPortType.TextureCubeObject ||
+				OutputType == SubgraphPortType.SamplerState);
+		}
+	}
+
+	public BlackboardSubgraphOutputParameter() : base()
+	{
+		Preview = SubgraphOutputPreviewType.None;
+	}
+
+	public override object GetValue()
+	{
+		return null;
+	}
+
+	public override void SetValue( object value )
+	{
 	}
 }
 

@@ -41,37 +41,26 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 	[JsonIgnore, Hide, Browsable( false )]
 	public override bool CanRemove => true;
 
-	[JsonIgnore, Hide, Browsable( false )]
-	public bool CannotPreviewOutputType
-	{
-		get
-		{
-			return (OutputType == SubgraphPortType.Bool ||
-				OutputType == SubgraphPortType.Float2x2 ||
-				OutputType == SubgraphPortType.Float3x3 ||
-				OutputType == SubgraphPortType.Float4x4 ||
-				OutputType == SubgraphPortType.Gradient ||
-				OutputType == SubgraphPortType.Texture2DObject ||
-				OutputType == SubgraphPortType.TextureCubeObject ||
-				OutputType == SubgraphPortType.SamplerState);
-		}
-
-	}
+	//[Hide, Browsable( false )]
+	//public Guid OutputIdentifier { get; set; }
 
 	[Hide, Browsable( false )]
-	public Guid OutputIdentifier { get; set; }
+	public Guid ParameterIdentifier { get; set; }
 
-	public string OutputName { get; set; } = "Ouat0";
+	[JsonIgnore, Hide, Browsable( false )]
+	public string OutputName => GetParameter().Name;
 
-	[TextArea]
-	public string OutputDescription { get; set; } = "";
+	[JsonIgnore, Hide, Browsable( false )]
+	public string OutputDescription => GetParameter().OutputDescription;
 
-	public SubgraphPortType OutputType { get; set; } = SubgraphPortType.Vector3;
+	[JsonIgnore, Hide, Browsable( false )]
+	public SubgraphPortType OutputType => GetParameter().OutputType;
 
-	[HideIf( nameof( CannotPreviewOutputType ), true )]
-	public SubgraphOutputPreviewType Preview { get; set; } = SubgraphOutputPreviewType.None;
+	[JsonIgnore, Hide, Browsable( false )]
+	public SubgraphOutputPreviewType Preview => GetParameter().Preview;
 
-	public int PortOrder { get; set; } = 0;
+	[JsonIgnore, Hide, Browsable( false )]
+	public int PortOrder => GetParameter().PortOrder;
 
 	[Hide]
 	private List<IPlugIn> InternalInputs = new();
@@ -81,7 +70,6 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 	public SubgraphOutput() : base()
 	{
-		OutputIdentifier = Guid.NewGuid();
 	}
 
 	[JsonIgnore, Hide, Browsable( false )]
@@ -90,13 +78,30 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 	public override void OnFrame()
 	{
 		var hashCodeInput = 0;
-		hashCodeInput = System.HashCode.Combine( OutputIdentifier, OutputName, OutputDescription, OutputType, PortOrder );
+		hashCodeInput = System.HashCode.Combine( ParameterIdentifier, OutputName, OutputDescription, OutputType, PortOrder );
 
 		if ( hashCodeInput != _lastHashCode )
 		{
 			_lastHashCode = hashCodeInput;
 			InitializeNode();
 		}
+	}
+
+	private IBlackboardSubgraphOutputParameter GetParameter()
+	{
+		if ( Graph is ShaderGraphPlus graph )
+		{
+			var parameter = graph.FindParameter( ParameterIdentifier );
+
+			if ( parameter is IBlackboardSubgraphOutputParameter subgraphOutputParameter )
+			{
+				return subgraphOutputParameter;
+			}
+
+			return new FloatSubgraphOutputParameter();
+		}
+
+		return new FloatSubgraphOutputParameter();
 	}
 
 	public void InitializeNode()
@@ -130,7 +135,7 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 		var info = new PlugInfo()
 		{
-			Id = OutputIdentifier,
+			Id = ParameterIdentifier,
 			Name = OutputName,
 			Type = type,
 			DisplayInfo = new()
@@ -165,50 +170,7 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 	public void SetSubgraphPortTypeFromType( Type type )
 	{
-		switch ( type )
-		{
-			case Type t when t == typeof( bool ):
-				OutputType = SubgraphPortType.Bool;
-				break;
-			case Type t when t == typeof( int ):
-				OutputType = SubgraphPortType.Int;
-				break;
-			case Type t when t == typeof( float ):
-				OutputType = SubgraphPortType.Float;
-				break;
-			case Type t when t == typeof( Vector2 ):
-				OutputType = SubgraphPortType.Vector2;
-				break;
-			case Type t when t == typeof( Vector3 ):
-				OutputType = SubgraphPortType.Vector3;
-				break;
-			case Type t when t == typeof( Vector4 ):
-				OutputType = SubgraphPortType.Vector4;
-				break;
-			case Type t when t == typeof( Color ):
-				OutputType = SubgraphPortType.Vector4;
-				break;
-			case Type t when t == typeof( ColorTextureGenerator ):
-				OutputType = SubgraphPortType.Color;
-				break;
-			case Type t when t == typeof( Float2x2 ):
-				OutputType = SubgraphPortType.Float2x2;
-				break;
-			case Type t when t == typeof( Float3x3 ):
-				OutputType = SubgraphPortType.Float3x3;
-				break;
-			case Type t when t == typeof( Float4x4 ):
-				OutputType = SubgraphPortType.Float4x4;
-				break;
-			case Type t when t == typeof( Gradient ):
-				OutputType = SubgraphPortType.Gradient;
-				break;
-			case Type t when t == typeof( Sampler ):
-				OutputType = SubgraphPortType.SamplerState;
-				break;
-			default:
-				throw new Exception( $"Unknown type \"{type}\"" );
-		}
+		// TODO
 	}
 
 	public void AddMaterialOutput( GraphCompiler compiler, StringBuilder sb, SubgraphOutputPreviewType previewType, out List<string> errors )
@@ -216,9 +178,14 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 		errors = new List<string>();
 
 		// Make sure we dont try to preview outputs that we cant.
-		if ( CannotPreviewOutputType )
+		var parameter = GetParameter();
+		var graph = Graph as ShaderGraphPlus;
+
+		if ( GetParameter().CannotPreviewOutputType )
 		{
-			Preview = SubgraphOutputPreviewType.None;
+			parameter.Preview = SubgraphOutputPreviewType.None;
+			graph.UpdateParameter( parameter );
+
 			return;
 		}
 
@@ -290,14 +257,18 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 	public NodeInput? GetInputFromPreview( SubgraphOutputPreviewType previewType )
 	{
 		// Make sure we dont try to preview outputs that we cant.
-		if ( CannotPreviewOutputType )
+		var parameter = GetParameter();
+		var graph = Graph as ShaderGraphPlus;
+
+		if ( parameter.CannotPreviewOutputType )
 		{
-			Preview = SubgraphOutputPreviewType.None;
+			parameter.Preview = SubgraphOutputPreviewType.None;
+			graph.UpdateParameter( parameter );
 		}
 
 		if ( Preview == previewType )
 		{
-			var input = Inputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Id == OutputIdentifier );
+			var input = Inputs.FirstOrDefault( x => x is BasePlugIn plugIn && plugIn.Info.Id == ParameterIdentifier );
 			if ( input is BasePlugIn plugIn )
 			{
 
@@ -408,12 +379,12 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 		if ( Graph is ShaderGraphPlus shaderGraphPlus && shaderGraphPlus.IsSubgraph )
 		{
-			if ( string.IsNullOrWhiteSpace( OutputName ) )
-			{
-				errors.Add( $"Subgraph output must have a name!" );
-
-				return errors;
-			}
+			//if ( string.IsNullOrWhiteSpace( OutputName ) )
+			//{
+			//	errors.Add( $"Subgraph output must have a name!" );
+			//
+			//	return errors;
+			//}
 
 			foreach ( var node in Graph.Nodes )
 			{
@@ -422,7 +393,7 @@ public sealed class SubgraphOutput : BaseResult, BaseNodePlus.IInitializeNode, I
 
 				if ( node is SubgraphOutput otherOutput && otherOutput.OutputName == OutputName )
 				{
-					errors.Add( $"Duplicate subgraph output name \"{OutputName}\"" );
+					errors.Add( $"Duplicate subgraph output node \"{OutputName}\"" );
 
 					break;
 				}

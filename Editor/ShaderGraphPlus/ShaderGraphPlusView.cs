@@ -191,103 +191,67 @@ public class ShaderGraphPlusView : GraphView
 
 	protected override void OnPopulateNodeMenuSpecialOptions( Menu menu, Vector2 clickPos, NodePlug targetPlug, string filter )
 	{
+		void NewParameterMenuOption( Menu menu, string baseParameterName, IBlackboardParameterType classType, string undoScopeName )
+		{
+			var option = menu.AddOption( classType.Type.Title, classType.Type.Icon, () =>
+			{
+				using var undoScope = UndoScope( undoScopeName );
+
+				var baseName = baseParameterName;
+				var id = 0;
+				while ( Graph.HasParameterWithName( $"{baseName}{id}" ) )
+				{
+					id++;
+				}
+
+				var parameter = CreateNewParameter( classType );
+				parameter.Name = $"{baseName}{id}";
+
+				var node = CreateNewParameterNode( parameter, clickPos );
+
+				SelectNode( node );
+				_window.OnSelected( parameter );
+			} );
+		}
+
 		base.OnPopulateNodeMenuSpecialOptions( menu, clickPos, targetPlug, filter );
 		var isSubgraph = Graph.IsSubgraph;
 
 		if ( !targetPlug.IsValid() )
 		{
-			var newParameterMenu = menu.AddMenu( $"Create {(isSubgraph ? "Subgraph Input" : "Parameter")}", "add" );
-
-			foreach ( var classType in BlackboardParameter.GetRelevantParameters( AvailableParameters, Graph.IsSubgraph ).OrderBy( x => x.Type.GetAttribute<OrderAttribute>().Value ) )
+			if ( !isSubgraph )
 			{
-				var targetType = classType.Type.TargetType;
+				var newMaterialParameterMenu = menu.AddMenu( $"Create Parameter", "add" );
 
-				newParameterMenu.AddOption( classType.Type.Title, classType.Type.Icon, () =>
+				foreach ( var classType in BlackboardParameter.GetRelevantParameters( AvailableParameters, false ).OrderBy( x =>
+						x.Type.GetAttribute<OrderAttribute>().Value ) )
 				{
-					using var undoScope = UndoScope( "Add Parameter" );
 
-					var baseName = $"{(Graph.IsSubgraph ? "SubgraphInput" : "MaterialParameter")}";
-					var id = 0;
-					while ( Graph.HasParameterWithName( $"{baseName}{id}" ) )
-					{
-						id++;
-					}
-
-					var parameter = CreateNewParameter( classType );
-					parameter.Name = $"{baseName}{id}";
-
-					var node = CreateNewParameterNode( parameter, clickPos );
-
-					SelectNode( node );
-					_window.OnSelected( parameter );
-				} );
+					var baseName = !classType.Type.TargetType.IsAssignableTo( typeof( IShaderFeatureParameter ) ) ? "MaterialParameter" : "ShaderFeature";
+					NewParameterMenuOption( newMaterialParameterMenu, baseName, classType, "Add Material Parameter" );
+				}
 			}
-		}
+			else
+			{
+				var newSubgraphInputParameterMenu = menu.AddMenu( $"Create Subgraph Input", "add" );
 
-		if ( isSubgraph )
-		{
-			var newSubgraphOutputMenu = menu.AddMenu( $"Create Subgraph Output", "add" );
+				foreach ( var classType in BlackboardParameter.GetRelevantParameters( AvailableParameters, true ).Where( x =>
+					x.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) ).OrderBy( x =>
+						x.Type.GetAttribute<OrderAttribute>().Value ) )
+				{
+					NewParameterMenuOption( newSubgraphInputParameterMenu, "SubgraphInput", classType, "Add Subgraph Input Parameter" );
+				}
 
-			newSubgraphOutputMenu.AddOption( "Bool", "check_box", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Bool );
-			} );
-			newSubgraphOutputMenu.AddOption( "Int", "looks_one", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Int );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float", "looks_one", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Float );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float2", "looks_two", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Vector2 );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float3", "looks_3", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Vector3 );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float4", "looks_4", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Vector4 );
-			} );
-			newSubgraphOutputMenu.AddOption( "Color", "palette", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Color );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float2x2", "apps", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Float2x2 );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float3x3", "apps", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Float3x3 );
-			} );
-			newSubgraphOutputMenu.AddOption( "Float4x4", "apps", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Float4x4 );
-			} );
-			newSubgraphOutputMenu.AddOption( "Gradient", "gradient", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Gradient );
-			} );
-			newSubgraphOutputMenu.AddOption( "Texture2D", "texture", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.Texture2DObject );
-			} );
-			newSubgraphOutputMenu.AddOption( "TextureCube", "view_in_ar", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.TextureCubeObject );
-			} );
-			newSubgraphOutputMenu.AddOption( "Sampler State", "colorize", () =>
-			{
-				CreateNewSubgraphOutputNode( clickPos, SubgraphPortType.SamplerState );
-			} );
-		}
+				var newSubgraphOutputParameterMenu = menu.AddMenu( $"Create Subgraph Output", "add" );
 
-		if ( !targetPlug.IsValid() )
-		{
+				foreach ( var classType in BlackboardParameter.GetRelevantParameters( AvailableParameters, true ).Where( x =>
+					x.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) ).OrderBy( x =>
+						x.Type.GetAttribute<OrderAttribute>().Value ) )
+				{
+					 NewParameterMenuOption( newSubgraphOutputParameterMenu, "SubgraphOutput", classType, "Add Subgraph Output Parameter" );
+				}
+			}
+
 			//menu.AddOption( "Add Named Reroute Declaration", "route", () =>
 			//{
 			//	var nodeType = new NamedRerouteDeclarationNodeType( EditorTypeLibrary.GetType<NamedRerouteDeclarationNode>() );
@@ -358,24 +322,6 @@ public class ShaderGraphPlusView : GraphView
 				//SelectNode( namedRerouteDeclaration );
 				//_window.SetPropertiesTarget( namedRerouteDeclaration );
 			}
-		}
-	}
-
-	private void CreateNewSubgraphOutputNode( Vector2 position, SubgraphPortType outputType )
-	{
-		var baseName = $"SubgraphOutput";
-		var id = 0;
-		while ( Graph.Nodes.OfType<SubgraphOutput>().Any( x => x.OutputName == $"{baseName}{id}" ) )
-		{
-			id++;
-		}
-
-		var nodeFullName = DisplayInfo.ForType( typeof( SubgraphOutput ) ).Fullname;
-		if ( AvailableNodes.TryGetValue( nodeFullName, out var nodeType ) )
-		{
-			var parameterNodeType = new SubgraphOutputNodeType( ((ClassNodeType)nodeType).Type, outputType, $"{baseName}{id}" );
-
-			CreateNewNode( parameterNodeType, position );
 		}
 	}
 

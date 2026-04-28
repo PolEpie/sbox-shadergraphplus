@@ -1,9 +1,9 @@
 ﻿namespace ShaderGraphPlus;
 
 /// <summary>
-/// Bool value subgraph input
+/// Bool subgraph input parameter
 /// </summary>
-[Title( "Bool" ), Icon( "check_box" ), Order( 0 )]
+[Title( "Bool" ), Icon( "check_box" ), Category( "Input" ), Order( 0 )]
 [SubgraphOnly]
 public sealed class BoolSubgraphInputParameter : BlackboardSubgraphInputParameter<bool>
 {
@@ -17,9 +17,24 @@ public sealed class BoolSubgraphInputParameter : BlackboardSubgraphInputParamete
 }
 
 /// <summary>
-/// Int value subgraph input
+/// Bool subgraph output parameter
 /// </summary>
-[Title( "Int" ), Icon( "looks_one" ), Order( 1 )]
+[Title( "Bool" ), Icon( "check_box" ), Category( "Output" ), Order( 0 )]
+[SubgraphOnly]
+public sealed class BoolSubgraphOutputParameter : BlackboardSubgraphOutputParameter<bool>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Bool;
+
+	public BoolSubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Int subgraph input parameter
+/// </summary>
+[Title( "Int" ), Icon( "looks_one" ), Category( "Input" ), Order( 1 )]
 [SubgraphOnly]
 public sealed class IntSubgraphInputParameter : BlackboardSubgraphInputParameter<int>
 {
@@ -38,9 +53,24 @@ public sealed class IntSubgraphInputParameter : BlackboardSubgraphInputParameter
 }
 
 /// <summary>
-/// Float value subgraph input
+/// Int subgraph output parameter
 /// </summary>
-[Title( "Float" ), Icon( "looks_one" ), Order( 2 )]
+[Title( "Int" ), Icon( "looks_one" ), Category( "Output" ), Order( 1 )]
+[SubgraphOnly]
+public sealed class IntSubgraphOutputParameter : BlackboardSubgraphOutputParameter<int>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Int;
+
+	public IntSubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float subgraph input parameter
+/// </summary>
+[Title( "Float" ), Icon( "looks_one" ), Category( "Input" ), Order( 2 )]
 [SubgraphOnly]
 public sealed class FloatSubgraphInputParameter : BlackboardSubgraphInputParameter<float>
 {
@@ -59,9 +89,24 @@ public sealed class FloatSubgraphInputParameter : BlackboardSubgraphInputParamet
 }
 
 /// <summary>
-/// Float2 value subgraph input
+/// Float subgraph output parameter
 /// </summary>
-[Title( "Float2" ), Icon( "looks_two" ), Order( 3 )]
+[Title( "Float" ), Icon( "looks_one" ), Category( "Output" ), Order( 2 )]
+[SubgraphOnly]
+public sealed class FloatSubgraphOutputParameter : BlackboardSubgraphOutputParameter<float>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Float;
+
+	public FloatSubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float2 subgraph input parameter
+/// </summary>
+[Title( "Float2" ), Icon( "looks_two" ), Category( "Input" ), Order( 3 )]
 [SubgraphOnly]
 public sealed class Float2SubgraphInputParameter : BlackboardSubgraphInputParameter<Vector2>
 {
@@ -80,9 +125,24 @@ public sealed class Float2SubgraphInputParameter : BlackboardSubgraphInputParame
 }
 
 /// <summary>
-/// Float3 value subgraph input
+/// Float2 subgraph output parameter
 /// </summary>
-[Title( "Float3" ), Icon( "looks_3" ), Order( 4 )]
+[Title( "Float2" ), Icon( "looks_two" ), Category( "Output" ), Order( 3 )]
+[SubgraphOnly]
+public sealed class Float2SubgraphOutputParameter : BlackboardSubgraphOutputParameter<Vector2>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Vector2;
+
+	public Float2SubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float3 subgraph input parameter
+/// </summary>
+[Title( "Float3" ), Icon( "looks_3" ), Category( "Input" ), Order( 4 )]
 [SubgraphOnly]
 public sealed class Float3SubgraphInputParameter : BlackboardSubgraphInputParameter<Vector3>
 {
@@ -101,9 +161,24 @@ public sealed class Float3SubgraphInputParameter : BlackboardSubgraphInputParame
 }
 
 /// <summary>
-/// Float4 value subgraph input
+/// Float3 subgraph output parameter
 /// </summary>
-[Title( "Float4" ), Icon( "looks_4" ), Order( 5 )]
+[Title( "Float3" ), Icon( "looks_3" ), Category( "Output" ), Order( 4 )]
+[SubgraphOnly]
+public sealed class Float3SubgraphOutputParameter : BlackboardSubgraphOutputParameter<Vector3>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Vector3;
+
+	public Float3SubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float4 subgraph input parameter
+/// </summary>
+[Title( "Float4" ), Icon( "looks_4" ), Category( "Input" ), Order( 5 )]
 [SubgraphOnly]
 public sealed class Float4SubgraphInputParameter : BlackboardSubgraphInputParameter<Vector4>
 {
@@ -122,9 +197,24 @@ public sealed class Float4SubgraphInputParameter : BlackboardSubgraphInputParame
 }
 
 /// <summary>
-/// Color value subgraph input
+/// Float4 subgraph output parameter
 /// </summary>
-[Title( "Color" ), Icon( "palette" ), Order( 6 )]
+[Title( "Float4" ), Icon( "looks_4" ), Category( "Output" ), Order( 5 )]
+[SubgraphOnly]
+public sealed class Float4SubgraphOutputParameter : BlackboardSubgraphOutputParameter<Vector4>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Vector4;
+
+	public Float4SubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Color subgraph input parameter
+/// </summary>
+[Title( "Color" ), Icon( "palette" ), Category( "Input" ), Order( 6 )]
 [SubgraphOnly]
 public sealed class ColorSubgraphInputParameter : BlackboardSubgraphInputParameter<Color>
 {
@@ -138,9 +228,24 @@ public sealed class ColorSubgraphInputParameter : BlackboardSubgraphInputParamet
 }
 
 /// <summary>
-/// Float2x2 value subgraph input
+/// Color subgraph output parameter
 /// </summary>
-[Title( "Float2x2" ), Icon( "apps" ), Order( 7 )]
+[Title( "Color" ), Icon( "palette" ), Category( "Output" ), Order( 6 )]
+[SubgraphOnly]
+public sealed class ColorSubgraphOutputParameter : BlackboardSubgraphOutputParameter<Color>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Color;
+
+	public ColorSubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float2x2 subgraph input parameter
+/// </summary>
+[Title( "Float2x2" ), Icon( "apps" ), Category( "Input" ), Order( 7 )]
 [SubgraphOnly]
 public sealed class Float2x2SubgraphInputParameter : BlackboardSubgraphInputParameter<Float2x2>
 {
@@ -154,7 +259,22 @@ public sealed class Float2x2SubgraphInputParameter : BlackboardSubgraphInputPara
 }
 
 /// <summary>
-/// Float3x3 value subgraph input
+/// Float2x2 subgraph output parameter
+/// </summary>
+[Title( "Float2x2" ), Icon( "apps" ), Category( "Output" ), Order( 7 )]
+[SubgraphOnly]
+public sealed class Float2x2SubgraphOutputParameter : BlackboardSubgraphOutputParameter<Float2x2>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Float2x2;
+
+	public Float2x2SubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float3x3 subgraph input parameter
 /// </summary>
 [Title( "Float3x3" ), Icon( "apps" ), Order( 8 )]
 [SubgraphOnly]
@@ -170,7 +290,22 @@ public sealed class Float3x3SubgraphInputParameter : BlackboardSubgraphInputPara
 }
 
 /// <summary>
-/// Float4x4 value subgraph input
+/// Float3x3 subgraph output parameter
+/// </summary>
+[Title( "Float3x3" ), Icon( "apps" ), Order( 8 )]
+[SubgraphOnly]
+public sealed class Float3x3SubgraphOutputParameter : BlackboardSubgraphOutputParameter<Float3x3>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Float3x3;
+
+	public Float3x3SubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Float4x4 subgraph input parameter
 /// </summary>
 [Title( "Float4x4" ), Icon( "apps" ), Order( 9 )]
 [SubgraphOnly]
@@ -186,7 +321,22 @@ public sealed class Float4x4SubgraphInputParameter : BlackboardSubgraphInputPara
 }
 
 /// <summary>
-/// Gradient value subgraph input
+/// Float4x4 subgraph output parameter
+/// </summary>
+[Title( "Float4x4" ), Icon( "apps" ), Order( 9 )]
+[SubgraphOnly]
+public sealed class Float4x4SubgraphOutputParameter : BlackboardSubgraphOutputParameter<Float4x4>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Float4x4;
+
+	public Float4x4SubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// Gradient subgraph input parameter 
 /// </summary>
 [Title( "Gradient" ), Icon( "gradient" ), Order( 10 )]
 [SubgraphOnly]
@@ -198,6 +348,22 @@ public sealed class GradientSubgraphInputParameter : BlackboardSubgraphInputPara
 	public GradientSubgraphInputParameter() : base()
 	{
 		Value = new Gradient();
+	}
+}
+
+
+/// <summary>
+/// Gradient subgraph output parameter 
+/// </summary>
+[Title( "Gradient" ), Icon( "gradient" ), Order( 10 )]
+[SubgraphOnly]
+public sealed class GradientSubgraphOutputParameter : BlackboardSubgraphOutputParameter<Gradient>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Gradient;
+
+	public GradientSubgraphOutputParameter() : base()
+	{
 	}
 }
 
@@ -223,6 +389,22 @@ public sealed class Texture2DSubgraphInputParameter : BlackboardSubgraphInputPar
 			DefaultColor = Color.White,
 		};
 		IsRequired = true;
+	}
+}
+
+
+/// <summary>
+/// Texture2D subgraph output parameter
+/// </summary>
+[Title( "Texture2D" ), Icon( "image" ), Order( 11 )]
+[SubgraphOnly]
+public sealed class Texture2DSubgraphOutputParameter : BlackboardSubgraphOutputParameter<TextureInput>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.Texture2DObject;
+
+	public Texture2DSubgraphOutputParameter() : base()
+	{
 	}
 }
 
@@ -252,7 +434,22 @@ public sealed class TextureCubeSubgraphInputParameter : BlackboardSubgraphInputP
 }
 
 /// <summary>
-/// SamplerState subgraph input
+/// TextureCube subgraph output parameter
+/// </summary>
+[Title( "TextureCube" ), Icon( "image" ), Order( 12 )]
+[SubgraphOnly]
+public sealed class TextureCubeSubgraphOutputParameter : BlackboardSubgraphOutputParameter<TextureInput>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.TextureCubeObject;
+
+	public TextureCubeSubgraphOutputParameter() : base()
+	{
+	}
+}
+
+/// <summary>
+/// SamplerState subgraph input parameter
 /// </summary>
 [Title( "Sampler State" ), Icon( "colorize" ), Order( 13 )]
 [SubgraphOnly]
@@ -261,11 +458,23 @@ public sealed class SamplerStateSubgraphInputParameter : BlackboardSubgraphInput
 	[Hide, JsonIgnore]
 	public override SubgraphPortType InputType => SubgraphPortType.SamplerState;
 
-	//[Hide, JsonIgnore]
-	//public override bool IsRequired { get; set; } = true;
-
 	public SamplerStateSubgraphInputParameter() : base()
 	{
 		Value = new Sampler();
+	}
+}
+
+/// <summary>
+/// SamplerState subgraph output parameter
+/// </summary>
+[Title( "Sampler State" ), Icon( "colorize" ), Order( 13 )]
+[SubgraphOnly]
+public sealed class SamplerStateSubgraphOutputParameter : BlackboardSubgraphOutputParameter<Sampler>
+{
+	[Hide, JsonIgnore]
+	public override SubgraphPortType OutputType => SubgraphPortType.SamplerState;
+
+	public SamplerStateSubgraphOutputParameter() : base()
+	{
 	}
 }

@@ -15,6 +15,9 @@ internal class FunctionResultConvert : BaseNodeConvert
 
 		//SGPLog.Info( "Convert functionResult node" );
 
+		throw new NotImplementedException();
+
+		/*
 		Vector2 lastOffset = Vector2.Zero;
 		foreach ( var oldInput in oldFunctionResult.FunctionOutputs )
 		{
@@ -45,7 +48,8 @@ internal class FunctionResultConvert : BaseNodeConvert
 
 			newNodes.Add( newSubgraphOutput );
 		}
-
+		
 		return newNodes;
+		*/
 	}
 }

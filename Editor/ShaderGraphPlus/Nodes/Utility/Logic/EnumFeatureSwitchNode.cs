@@ -134,7 +134,7 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 	private ShaderFeatureEnum GetFeature()
 	{
 		var parameter = GetFeatureParameter();
-		
+
 		if ( parameter.IsValid )
 		{
 			var featureEnum = new ShaderFeatureEnum
@@ -144,7 +144,7 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 				HeaderName = parameter.HeaderName,
 				Options = parameter.Options,
 			};
-		
+
 			return featureEnum;
 		}
 

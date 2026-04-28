@@ -89,7 +89,7 @@ public sealed partial class GraphCompiler
 		public HashSet<string> Functions { get; private set; } = new();
 
 		public string RepresentativeTexture { get; set; }
-		
+
 		internal void Replace( Dictionary<string, string> globals, Dictionary<string, object> attributes, HashSet<string> functions )
 		{
 			Globals = globals;

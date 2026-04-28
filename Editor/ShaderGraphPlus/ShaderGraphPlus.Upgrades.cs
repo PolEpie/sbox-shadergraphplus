@@ -74,6 +74,47 @@ public partial class ShaderGraphPlus
 		}
 	}
 
+	private static bool GetDeserializedKeyAndRemoveKey<T>( JsonObject obj, string key, out T data )
+	{
+		data = default( T );
+
+		if ( obj.ContainsKey( key ) )
+		{
+			var jsonNode = obj[key].DeepClone();
+			obj.Remove( key );
+			data = jsonNode.Deserialize<T>( SerializerOptions() );
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	private static bool GetDeserializedKey<T>( JsonObject obj, string key, out T data )
+	{
+		data = default( T );
+
+		if ( obj.ContainsKey( key ) )
+		{
+			var jsonobj = obj[key];
+
+			if ( jsonobj != null )
+			{
+				var jsonNode = jsonobj.DeepClone();
+
+				data = JsonSerializer.Deserialize<T>( jsonNode, SerializerOptions() );
+			}
+
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	private static void CopyToNewKey( JsonObject obj, string oldkey, string newKey )
 	{
 		if ( obj.ContainsKey( oldkey ) )

@@ -1,7 +1,6 @@
 using Editor;
-using Editor.ShaderGraph;
+using NodeEditorPlus;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace ShaderGraphPlus;
 
@@ -99,9 +98,10 @@ public class BlackboardView : Widget
 		_searchClear.Visible = false;
 
 		_treeView = new TreeView();
+		_treeView.ItemSpacing = 0;
 		_treeView.MultiSelect = false;
-		_treeView.Margin = 4;
-		_treeView.ItemSpacing = 4;
+		_treeView.Margin = 0;
+		_treeView.ItemSpacing = 0;
 		_treeView.BodyDropTarget = TreeView.DragDropTarget.None;
 		_treeView.BodyContextMenu = OpenTreeViewContextMenu;
 		_treeView.OnPaintOverride = () =>
@@ -145,40 +145,64 @@ public class BlackboardView : Widget
 
 	private void CreateParameterTypeSelectionPopupMenu()
 	{
-		var popup = new PopupWidget( this );
-		popup.Layout = Layout.Column();
-		popup.Width = ScreenRect.Width;
-
-		var scroller = popup.Layout.Add( new ScrollArea( this ), 1 );
-		scroller.Canvas = new Widget( scroller )
-		{
-			Layout = Layout.Column(),
-			VerticalSizeMode = SizeMode.CanGrow | SizeMode.Expand
-		};
+		var m = new ContextMenu( _treeView );
 
 		IBlackboardParameterType[] avalibleTypes = BlackboardParameter.GetRelevantParameters( _availableParameters, Graph.IsSubgraph ).ToArray();
 
-		foreach ( var parameterType in avalibleTypes.OrderBy( x => x.Type.Order ) )
+		if ( !Graph.IsSubgraph )
 		{
-			var entry = scroller.Canvas.Layout.Add( new ParameterTypeEntry( _addButton, parameterType ) );
-			entry.MouseLeftPress = () =>
+			var materialParametersMenu = m.AddMenu( "Input", "input" );
+
+			foreach ( var parameterType in avalibleTypes.OfType<ClassBlackboardParameterType>().OrderBy( x => x.Type.Order ) )
 			{
-				CreateNewParameter( parameterType );
-				popup.Update();
-				popup.Close();
-			};
+				var icon = parameterType.DisplayInfo.Icon;
+				var description = parameterType.DisplayInfo.Description;
+
+				var option = materialParametersMenu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
+				{
+					CreateNewParameter( parameterType );
+
+					m.Update();
+					m.Close();
+				} );
+
+				option.ToolTip = description;
+			}
+		}
+		else
+		{
+			var subgraphInputsMenu = m.AddMenu( "Input", "input" );
+			var subgraphOutputsMenu = m.AddMenu( "Output", "output" );
+
+			foreach ( var parameterType in avalibleTypes.OfType<ClassBlackboardParameterType>().OrderBy( x => x.Type.Order ) )
+			{
+				var icon = parameterType.DisplayInfo.Icon;
+				var description = parameterType.DisplayInfo.Description;
+
+				if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) )
+				{
+					subgraphInputsMenu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
+					{
+						CreateNewParameter( parameterType );
+
+						m.Update();
+						m.Close();
+					} );
+				}
+				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) )
+				{
+					subgraphOutputsMenu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
+					{
+						CreateNewParameter( parameterType );
+
+						m.Update();
+						m.Close();
+					} );
+				}
+			}
 		}
 
-		popup.Position = _addButton.ScreenRect.BottomLeft;
-		popup.Visible = true;
-		popup.AdjustSize();
-		popup.ConstrainToScreen();
-		popup.OnPaintOverride = () =>
-		{
-			Paint.SetBrushAndPen( Theme.ControlBackground );
-			Paint.DrawRect( Paint.LocalRect, 0 );
-			return true;
-		};
+		m.OpenAtCursor( false );
 	}
 
 	[EditorEvent.Frame]
@@ -461,6 +485,7 @@ file class ParameterTypeEntry : Widget
 		var opacity = hovered ? 1.0f : 0.7f;
 		var typeColor = Color.White;
 		var textColor = Theme.TextControl.WithAlpha( hovered ? 1.0f : 0.5f );
+		var isSubgraphoutput = Type.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) );
 
 		if ( ShaderGraphPlusTheme.BlackboardConfigs.TryGetValue( Type.Type.TargetType, out var blackboardConfig ) )
 		{
@@ -481,12 +506,14 @@ file class ParameterTypeEntry : Widget
 
 		Paint.SetDefaultFont( 8 );
 		Paint.SetPen( textColor );
-		Paint.DrawText( r, Text, TextFlag.LeftCenter );
+		Paint.DrawText( r, $"{Text} {(isSubgraphoutput ? $"Output" : $"Input")}", TextFlag.LeftCenter );
 	}
 }
 
 file class BlackboardParameterNode : TreeNode<BlackboardParameter>
 {
+	private DisplayInfo DisplayInfo => Value.DisplayInfo;
+
 	public BlackboardParameterNode( BlackboardParameter p ) : base( p )
 	{
 		Height = Theme.RowHeight;
@@ -507,11 +534,14 @@ file class BlackboardParameterNode : TreeNode<BlackboardParameter>
 
 	public override string GetTooltip()
 	{
-		var sb = new StringBuilder();
+		var tooltip = Name.WithColor( "#9CDCFE" );
 
-		sb.AppendLine( $"<h3>{Name}</h3>" );
+		var desc = DisplayInfo.Description ?? "No description given.";
+		tooltip += desc.StartsWith( "<br/>", StringComparison.OrdinalIgnoreCase )
+			? desc
+			: $"<br/>{desc}";
 
-		return sb.ToString();
+		return tooltip;
 	}
 
 	public override bool CanEdit => true;
@@ -532,64 +562,73 @@ file class BlackboardParameterNode : TreeNode<BlackboardParameter>
 		var variable = Value;
 		var isEven = item.Row % 2 == 0;
 		var isHovered = item.Hovered;
-		var fullSpanRect = item.Rect;
-		fullSpanRect.Left = 4;
-		fullSpanRect.Right = TreeView.Width - 4;
-		var textColor = Theme.TextControl;
-		var itemColor = Theme.ControlBackground;
+		var selected = item.Selected || item.Pressed || item.Dragging;
 		var typeColor = Color.White;
+		var typeName = DisplayInfo.ForType( variable.GetType() ).Name;
+		var isSubgraphoutput = variable.GetType().IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) );
+
+		var fullSpanRect = item.Rect;
+		fullSpanRect.Left = 0;
+		fullSpanRect.Right = TreeView.Width;
 
 		if ( ShaderGraphPlusTheme.BlackboardConfigs.TryGetValue( variable.GetType(), out var blackboardConfig ) )
 		{
 			typeColor = blackboardConfig.Color;
 		}
 
-		if ( item.Hovered )
-		{
-			textColor = Color.White;
-			itemColor = Theme.Primary.Lighten( 0.1f ).Desaturate( 0.3f ).WithAlpha( 0.4f * 0.6f );
 
-			Paint.ClearPen();
-			Paint.SetBrush( itemColor );
+		Paint.ClearPen();
+		if ( selected )
+		{
+			Paint.SetBrush( Theme.Blue.WithAlpha( 0.1f ) );
 			Paint.DrawRect( fullSpanRect );
-
-			Paint.SetPen( Theme.TextControl );
 		}
-		if ( item.Selected )
+		else if ( isHovered )
 		{
-			textColor = Theme.TextControl;
-			itemColor = Theme.Primary;
-
-			Paint.ClearPen();
-			Paint.SetBrush( itemColor );
+			Paint.SetBrush( Theme.SelectedBackground.WithAlpha( 0.25f ) );
 			Paint.DrawRect( fullSpanRect );
 		}
 		else if ( isEven )
 		{
-			Paint.ClearPen();
-			Paint.SetBrush( itemColor );
+			Paint.SetBrush( Theme.SurfaceLightBackground.WithAlpha( 0.1f ) );
 			Paint.DrawRect( fullSpanRect );
 		}
 
-		//Paint.ClearPen();
-		//Paint.SetBrush( itemColor );
-		//Paint.DrawRect( fullSpanRect, Theme.ControlRadius );
+		var textAlpha = (selected ? 1.0f : 0.85f);
+		var iconAlpha = selected ? 0.95f : 0.75f;
 
-		var iconRect = fullSpanRect.Shrink( 4, 0, 0, 0 );
+		var rect = new Rect( item.Rect.Position, new Vector2( item.Rect.Width, Height ) );
+		var outerTypeRect = rect.Shrink( 4f, 0f, 4f, 0f );
+
+		var typeNameWidth = Paint.MeasureText( typeName ).x + 24f;
+		var parameterNameWidth = Paint.MeasureText( Value.Name ).x + 24f;
+
+		outerTypeRect.Right += 4;
+
+		outerTypeRect.Size = outerTypeRect.Size.WithX( typeNameWidth + 24 );
+
+		Paint.SetPen( Theme.TextControl.WithAlpha( textAlpha * 1.0f ) );
+
+		Paint.DrawText( outerTypeRect, typeName, TextFlag.Center | TextFlag.SingleLine );
+
+		Paint.SetPen( Theme.TextControl.WithAlpha( textAlpha * 1.0f ) );
+
 		Paint.SetPen( typeColor );
-		Paint.DrawIcon( iconRect, "circle", 12f, TextFlag.LeftCenter );
-		fullSpanRect.Left += 24f;
 
-		Paint.SetPen( textColor.WithAlpha( 0.7f ) );
-		Paint.SetBrush( textColor.WithAlpha( 0.7f ) );
+		Paint.DrawIcon( outerTypeRect.Shrink( 6 ), "circle", 12, (isSubgraphoutput ? TextFlag.RightCenter : TextFlag.LeftCenter) | TextFlag.SingleLine );
 
-		var textRect = Paint.DrawText( fullSpanRect.Shrink( 4, 0, 0, 0 ), $"{variable.Name}", TextFlag.LeftCenter );
-		var typeRect = Paint.DrawText( fullSpanRect.Shrink( 0, 0, 4, 0 ), $"{DisplayInfo.ForType( variable.GetType() ).Name}", TextFlag.RightCenter );
+		var typeBackgroundRect = outerTypeRect.Shrink( 4 );
 
-		//Paint.SetPen( Color.Gray.WithAlpha( 0.25f ) );
-		//Paint.SetBrush( Color.Gray.WithAlpha( 0.25f ) );
-		//Paint.DrawRect( typeRect.Grow( 2 ), Theme.ControlRadius );
+		Paint.SetPen( Theme.ControlBackground.Lighten( 2.5f ) );
+		Paint.DrawRect( typeBackgroundRect, Theme.ControlRadius );
+
+		var nameRect = outerTypeRect;
+		nameRect.Left += typeBackgroundRect.Width + 12f;
+
+		Paint.SetPen( Theme.TextControl.WithAlpha( textAlpha * 1.0f ) );
+		Paint.DrawText( nameRect.Grow( 0f, 0f, 400, 0f ), Value.Name, TextFlag.LeftCenter | TextFlag.SingleLine );
 	}
+
 
 	public override bool OnDragStart()
 	{

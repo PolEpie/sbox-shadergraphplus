@@ -201,12 +201,13 @@ public partial class ShaderGraphPlus : INodeGraph
 		_parameters.Add( parameter.Identifier, parameter );
 	}
 
-	public void UpdateParameter( BlackboardParameter parameter )
+	public void UpdateParameter( IBlackboardParameter parameter )
 	{
-		if ( parameter.Graph != this )
+		var blackboardParameter = parameter as BlackboardParameter;
+		if ( blackboardParameter.Graph != this )
 			return;
 
-		_parameters[parameter.Identifier] = parameter;
+		_parameters[parameter.Identifier] = blackboardParameter;
 	}
 
 	public void UpdateParameterValue( Guid identifier, object value )

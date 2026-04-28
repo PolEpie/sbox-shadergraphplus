@@ -228,6 +228,23 @@ public class MainWindow : DockWindow
 					_properties.Target = _graph;
 				}
 			}
+			else if ( node is SubgraphOutput subgraphOutput )
+			{
+				// For now only select a blackboard parameter when _graphView only has 1 selection.
+				if ( _graphView.SelectedItems.Count() == 1 )
+				{
+					if ( subgraphOutput.ParameterIdentifier != default )
+					{
+						var blackboardParameter = _graph.FindParameter( subgraphOutput.ParameterIdentifier );
+						_blackboardView.SetSelection( blackboardParameter );
+						_properties.Target = blackboardParameter;
+					}
+				}
+				else
+				{
+					_properties.Target = _graph;
+				}
+			}
 			else
 			{
 				_properties.Target = node;
@@ -1281,18 +1298,18 @@ public class MainWindow : DockWindow
 		else
 		{
 			var result = _graphView.CreateNewNode( _graphView.FindNodeType( typeof( SubgraphOutput ) ), 0 );
+			var parameter = _blackboardView.CreateNewParameter( _graphView.FindParameterType( typeof( Float3SubgraphOutputParameter ) ) ) as Float3SubgraphOutputParameter;
+
+			parameter.Preview = SubgraphOutputPreviewType.Albedo;
 
 			var subgraphOutput = result.Node as SubgraphOutput;
-			subgraphOutput.OutputName = "Out0";
-			subgraphOutput.OutputType = SubgraphPortType.Vector3;
-			subgraphOutput.Preview = SubgraphOutputPreviewType.Albedo;
+			subgraphOutput.ParameterIdentifier = parameter.Identifier;
 
 			_graphView.Scale = 1;
 			_graphView.CenterOn( result.Size * 0.5f );
 		}
 
 		ClearAttributes();
-
 		RestoreShader();
 	}
 

@@ -61,6 +61,6 @@ public sealed class MathConstantsNode : ShaderNodePlus
 	{
 		var define = compiler.RegisterDefine( $"SGP_M_{Constant}", ConstantResult );
 
-		return new NodeResult( ResultType.Float, define, constant : true );
+		return new NodeResult( ResultType.Float, define, constant: true );
 	};
 }

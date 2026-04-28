@@ -5,9 +5,16 @@ public class ClassBlackboardParameterType : IBlackboardParameterType
 	public virtual string Identifier => Type.FullName;
 	public TypeDescription Type { get; }
 
+	public DisplayInfo DisplayInfo { get; protected set; }
+
 	public ClassBlackboardParameterType( TypeDescription type )
 	{
 		Type = type;
+
+		if ( Type is not null )
+			DisplayInfo = DisplayInfo.ForType( Type.TargetType );
+		else
+			DisplayInfo = new DisplayInfo();
 	}
 
 	public virtual IBlackboardParameter CreateParameter( INodeGraph graph, string name = "" )
@@ -17,17 +24,17 @@ public class ClassBlackboardParameterType : IBlackboardParameterType
 		if ( string.IsNullOrWhiteSpace( name ) )
 		{
 			string baseName;
-			if ( sg.IsSubgraph )
+			if ( Type.TargetType.IsAssignableFrom( typeof( IBlackboardSubgraphInputParameter ) ) )
 			{
 				baseName = "SubgraphInput";
 			}
-			else if ( Type.TargetType == typeof( ShaderFeatureBooleanParameter ) )
+			else if ( Type.TargetType.IsAssignableFrom( typeof( IBlackboardSubgraphOutputParameter ) ) )
 			{
-				baseName = "FeatureBoolean";
+				baseName = "SubgraphOutput";
 			}
-			else if ( Type.TargetType == typeof( ShaderFeatureEnumParameter ) )
+			else if ( Type.TargetType == typeof( ShaderFeatureBooleanParameter ) || Type.TargetType == typeof( ShaderFeatureEnumParameter ) )
 			{
-				baseName = "FeatureEnum";
+				baseName = "ShaderFeature";
 			}
 			else
 			{

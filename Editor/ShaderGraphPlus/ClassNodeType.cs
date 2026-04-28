@@ -112,8 +112,6 @@ public sealed class SubgraphOutputNodeType : ClassNodeType
 		var node = base.CreateNode( graph );
 		if ( node is SubgraphOutput subgraphOutput )
 		{
-			subgraphOutput.OutputName = Name;
-			subgraphOutput.OutputType = OutputType;
 		}
 		return node;
 	}

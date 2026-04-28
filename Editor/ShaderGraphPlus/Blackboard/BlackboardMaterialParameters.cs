@@ -3,7 +3,7 @@
 namespace ShaderGraphPlus;
 
 /// <summary>
-/// Bool value material parameter
+/// Bool material parameter
 /// </summary>
 [Title( "Bool" ), Icon( "check_box" ), Order( 0 )]
 public sealed class BoolParameter : BlackboardMaterialParameter<bool, GenericParameterUI>
@@ -16,7 +16,7 @@ public sealed class BoolParameter : BlackboardMaterialParameter<bool, GenericPar
 }
 
 /// <summary>
-/// Int value material parameter
+/// Int material parameter
 /// </summary>
 [Title( "Int" ), Icon( "looks_one" ), Order( 1 )]
 public sealed class IntParameter : BlackboardMaterialParameter<int, GenericParameterUI>, IRangedBlackboardMaterialParameter
@@ -44,7 +44,7 @@ public sealed class IntParameter : BlackboardMaterialParameter<int, GenericParam
 }
 
 /// <summary>
-/// Float value material parameter
+/// Float material parameter
 /// </summary>
 [Title( "Float" ), Icon( "looks_one" ), Order( 2 )]
 public sealed class FloatParameter : BlackboardMaterialParameter<float, FloatParameterUI>, IRangedBlackboardMaterialParameter
@@ -72,7 +72,7 @@ public sealed class FloatParameter : BlackboardMaterialParameter<float, FloatPar
 }
 
 /// <summary>
-/// Float2 value material parameter
+/// Float2 material parameter
 /// </summary>
 [Title( "Float2" ), Icon( "looks_two" ), Order( 3 )]
 public sealed class Float2Parameter : BlackboardMaterialParameter<Vector2, FloatParameterUI>, IRangedBlackboardMaterialParameter
@@ -100,7 +100,7 @@ public sealed class Float2Parameter : BlackboardMaterialParameter<Vector2, Float
 }
 
 /// <summary>
-/// Float3 value material parameter
+/// Float3 material parameter
 /// </summary>
 [Title( "Float3" ), Icon( "looks_3" ), Order( 4 )]
 public sealed class Float3Parameter : BlackboardMaterialParameter<Vector3, FloatParameterUI>, IRangedBlackboardMaterialParameter
@@ -128,7 +128,7 @@ public sealed class Float3Parameter : BlackboardMaterialParameter<Vector3, Float
 }
 
 /// <summary>
-/// Float4 value material parameter
+/// Float4 material parameter
 /// </summary>
 [Title( "Float4" ), Icon( "looks_4" ), Order( 5 )]
 public sealed class Float4Parameter : BlackboardMaterialParameter<Vector4, FloatParameterUI>, IRangedBlackboardMaterialParameter
@@ -156,7 +156,7 @@ public sealed class Float4Parameter : BlackboardMaterialParameter<Vector4, Float
 }
 
 /// <summary>
-/// Color value material parameter
+/// Color vmaterial parameter
 /// </summary>
 [Title( "Color" ), Icon( "palette" ), Order( 6 )]
 public sealed class ColorParameter : BlackboardMaterialParameter<Color, GenericParameterUI>
@@ -233,7 +233,7 @@ public sealed class SamplerStateParameter : BlackboardGenericParameter<Sampler>
 /// <summary>
 ///
 /// </summary>
-[Title( "Shader Feature Boolean" ), Order( 9 )]
+[Title( "Shader Feature Boolean" ), Icon( "tune" ), Order( 9 )]
 public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IShaderFeatureParameter
 {
 	[Hide, JsonIgnore, Browsable( false )]
@@ -277,7 +277,7 @@ public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IShader
 /// <summary>
 ///
 /// </summary>
-[Title( "Shader Feature Enum" ), Order( 10 )]
+[Title( "Shader Feature Enum" ), Icon( "tune" ), Order( 10 )]
 public sealed class ShaderFeatureEnumParameter : BlackboardParameter, IShaderFeatureParameter
 {
 	[Hide, JsonIgnore, Browsable( false )]
