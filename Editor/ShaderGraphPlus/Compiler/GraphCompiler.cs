@@ -770,7 +770,6 @@ public sealed partial class GraphCompiler
 			}
 			else
 			{
-
 				//value = GetDefaultValue( subgraphNode, input.Output, resultInput.Type );
 
 				switch ( resultNode.OutputType )
@@ -798,13 +797,20 @@ public sealed partial class GraphCompiler
 						break;
 				}
 
-				if ( value != null )
+				if ( value == null )
 				{
-					Log.Error( $"Missing Internal Input \'{resultInput.DisplayInfo.Name}\' in node \'{Subgraph.Path}\' falling back to default value \'{value}\'" );
+					subgraphNode.HasError = true;
+					subgraphNode.ErrorMessage = $"Missing internal input \'{resultInput.DisplayInfo.Name}\' in node \'{Subgraph.Path}\'";
+
+					SGPLogger.Error( subgraphNode.ErrorMessage );
+
+					NodeErrors[subgraphNode] = [subgraphNode.ErrorMessage];
+
+					return default;
 				}
 				else
 				{
-					Log.Error( $"Missing Internal Input \'{resultInput.DisplayInfo.Name}\' in node \'{Subgraph.Path}\'" );
+					SGPLogger.Error( $"Missing Internal Input \'{resultInput.DisplayInfo.Name}\' in node \'{Subgraph.Path}\' falling back to default value \'{value}\'" );
 				}
 
 				SubgraphStack.RemoveAt( SubgraphStack.Count - 1 );
