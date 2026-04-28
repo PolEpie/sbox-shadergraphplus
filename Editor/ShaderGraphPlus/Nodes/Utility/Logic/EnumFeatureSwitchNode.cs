@@ -87,7 +87,8 @@ public sealed class EnumFeatureSwitchNode : ShaderNodePlus, BaseNodePlus.IInitia
 					DisplayInfo = new()
 					{
 						Name = option.Name,
-						Fullname = typeof( object ).FullName
+						Fullname = typeof( object ).FullName,
+						Description = ""
 					}
 				};
 
