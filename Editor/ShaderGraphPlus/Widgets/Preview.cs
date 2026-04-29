@@ -23,9 +23,9 @@ public class Throbber : SceneCustomObject
 		}
 	}
 
-	private Preview3D _preview;
+	private Preview _preview;
 
-	public Throbber( SceneWorld sceneWorld, Preview3D preview ) : base( sceneWorld )
+	public Throbber( SceneWorld sceneWorld, Preview preview ) : base( sceneWorld )
 	{
 		_preview = preview;
 		_texture = Texture.Load( "tools/images/common/busy.png", true );
@@ -175,10 +175,10 @@ public class PerspectiveModeButton : Button
 	}
 }
 
-public sealed class Preview3DPanel : Widget
+public sealed class PreviewPanel : Widget
 {
-	private readonly Preview3D _preview;
-	public Preview3D Preview => _preview;
+	private readonly Preview _preview;
+	public Preview Preview => _preview;
 	private readonly ComboBox _animationCombo;
 	private readonly PerspectiveModeButton _perspectiveModeButton;
 
@@ -315,13 +315,13 @@ public sealed class Preview3DPanel : Widget
 		_preview.ClearAttributes();
 	}
 
-	public Preview3DPanel( Widget parent, string model ) : base( parent )
+	public PreviewPanel( Widget parent, string model ) : base( parent )
 	{
 		Name = "Preview3D";
 		WindowTitle = "Preview";
 		SetWindowIcon( "photo" );
 
-		_preview = new Preview3D( this, model );
+		_preview = new Preview( this, model );
 
 		Layout = Layout.Column();
 
@@ -474,7 +474,7 @@ public sealed class Preview3DPanel : Widget
 	}
 }
 
-public sealed class Preview3D : SceneRenderingWidget
+public sealed class Preview : SceneRenderingWidget
 {
 	private const int NoPreviewID = 0;
 	private SceneWorld _world => Scene.SceneWorld;
@@ -976,7 +976,7 @@ public sealed class Preview3D : SceneRenderingWidget
 		}
 	}
 
-	public Preview3D( Widget parent, string model ) : base( parent )
+	public Preview( Widget parent, string model ) : base( parent )
 	{
 		MouseTracking = true;
 		FocusMode = FocusMode.Click;

@@ -49,7 +49,7 @@ public class MainWindow : DockWindow
 	private Widget _graphCanvas;
 	private Widget _blackboardCanvas;
 	private Properties _properties;
-	private Preview3DPanel _preview3D;
+	private PreviewPanel _preview3D;
 	private Output _output;
 	private UndoHistory _undoHistory;
 	private PaletteWidget _palette;
@@ -1746,7 +1746,7 @@ public class MainWindow : DockWindow
 			_graphView.CenterOn( nodeUI.Center );
 		};
 
-		_preview3D = new Preview3DPanel( this, _graph.Model )
+		_preview3D = new PreviewPanel( this, _graph.Model )
 		{
 			OnModelChanged = ( model ) => _graph.Model = model?.Name
 		};
