@@ -757,7 +757,39 @@ public class MainWindow : DockWindow
 			if ( !result.IsValid() )
 				continue;
 
-			var componentType = result.ComponentType;
+			Type componentType = null;
+			if ( result.ResultType == ResultType.VoidFunction )
+			{
+				componentType = result.Components switch
+				{
+					int r when r == 1 => typeof( float ),
+					int r when r == 2 => typeof( Vector2 ),
+					int r when r == 3 => typeof( Vector3 ),
+					int r when r == 4 => typeof( Vector4 ),
+					_ => throw new NotImplementedException(),
+				};
+			}
+			else
+			{
+				componentType = result.ResultType switch
+				{
+					ResultType.Bool => typeof( bool ),
+					ResultType.Int => typeof( int ),
+					ResultType.Float => typeof( float ),
+					ResultType.Vector2 => typeof( Vector2 ),
+					ResultType.Vector3 => typeof( Vector3 ),
+					ResultType.Vector4 => typeof( Vector4 ),
+					ResultType.Float2x2 => typeof( Float2x2 ),
+					ResultType.Float3x3 => typeof( Float3x3 ),
+					ResultType.Float4x4 => typeof( Float4x4 ),
+					ResultType.Sampler => typeof( Sampler ),
+					ResultType.Texture2D => typeof( Texture ),
+					ResultType.TextureCube => typeof( Texture ),
+					ResultType.Gradient => typeof( Gradient ),
+					_ => throw new Exception( $"Unsupported ResultType \"{result.ResultType}\"" ),
+				};
+			}
+
 			if ( componentType == null )
 				continue;
 

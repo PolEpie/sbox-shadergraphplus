@@ -93,109 +93,33 @@ public struct NodeResult : IValid
 		}
 	}
 
-	public readonly bool CanCast
+	public readonly bool CanCast => ResultType switch
 	{
-		get
-		{
-			switch ( ResultType )
-			{
-				case ResultType.Float2x2:
-					return false;
-				case ResultType.Float3x3:
-					return false;
-				case ResultType.Float4x4:
-					return false;
-				case ResultType.Sampler:
-					return false;
-				case ResultType.Texture2D:
-					return false;
-				case ResultType.TextureCube:
-					return false;
-				case ResultType.Gradient:
-					return false;
-				case ResultType.VoidFunction:
-					return false;
-				case ResultType.Invalid:
-					return false;
-				case ResultType.Bool:
-					return false;
-				case ResultType.Int:
-					return true;
-				case ResultType.Float:
-					return true;
-				case ResultType.Vector2:
-					return true;
-				case ResultType.Vector3:
-					return true;
-				case ResultType.Vector4:
-					return true;
-				default:
-					return false;
-			}
-		}
-	}
+		ResultType.Int => true,
+		ResultType.Float => true,
+		ResultType.Vector2 => true,
+		ResultType.Vector3 => true,
+		ResultType.Vector4 => true,
+		_ => false,
+	};
 
-	public readonly string TypeName
+	public readonly string TypeName => ResultType switch
 	{
-		get
-		{
-			return ResultType switch
-			{
-				ResultType.Bool => "bool",
-				ResultType.Int => "int",
-				ResultType.Float => "float",
-				ResultType.Vector2 => "float2",
-				ResultType.Vector3 => "float3",
-				ResultType.Vector4 => "float4",
-				ResultType.Float2x2 => "float2x2",
-				ResultType.Float3x3 => "float3x3",
-				ResultType.Float4x4 => "float4x4",
-				ResultType.Sampler => "SamplerState",
-				ResultType.Texture2D => "Texture2D",
-				ResultType.TextureCube => "TextureCube",
-				ResultType.Gradient => "Gradient",
-				_ => throw new Exception( $"Unsupported ResultType `{ResultType}`" )
-			};
-		}
-	}
-
-	public readonly Type ComponentType
-	{
-		get
-		{
-			if ( ResultType == ResultType.VoidFunction )
-			{
-				return Components switch
-				{
-					int r when r == 1 => typeof( float ),
-					int r when r == 2 => typeof( Vector2 ),
-					int r when r == 3 => typeof( Vector3 ),
-					int r when r == 4 => typeof( Color ),
-					_ => throw new NotImplementedException(),
-				};
-			}
-			else
-			{
-				return ResultType switch
-				{
-					ResultType.Bool => typeof( bool ),
-					ResultType.Int => typeof( int ),
-					ResultType.Float => typeof( float ),
-					ResultType.Vector2 => typeof( Vector2 ),
-					ResultType.Vector3 => typeof( Vector3 ),
-					ResultType.Vector4 => typeof( Vector4 ),
-					ResultType.Float2x2 => typeof( Float2x2 ),
-					ResultType.Float3x3 => typeof( Float3x3 ),
-					ResultType.Float4x4 => typeof( Float4x4 ),
-					ResultType.Sampler => typeof( Sampler ),
-					ResultType.Texture2D => typeof( Texture ),
-					ResultType.TextureCube => typeof( Texture ),
-					ResultType.Gradient => typeof( Gradient ),
-					_ => throw new Exception( $"Unsupported ResultType \"{ResultType}\"" ),
-				};
-			}
-		}
-	}
+		ResultType.Bool => "bool",
+		ResultType.Int => "int",
+		ResultType.Float => "float",
+		ResultType.Vector2 => "float2",
+		ResultType.Vector3 => "float3",
+		ResultType.Vector4 => "float4",
+		ResultType.Float2x2 => "float2x2",
+		ResultType.Float3x3 => "float3x3",
+		ResultType.Float4x4 => "float4x4",
+		ResultType.Sampler => "SamplerState",
+		ResultType.Texture2D => "Texture2D",
+		ResultType.TextureCube => "TextureCube",
+		ResultType.Gradient => "Gradient",
+		_ => throw new Exception( $"Unsupported ResultType `{ResultType}`" )
+	};
 
 	public bool Constant { get; set; }
 
@@ -223,29 +147,6 @@ public struct NodeResult : IValid
 		{
 			Metadata = metadata;
 		}
-
-		Components = ResultType switch
-		{
-			ResultType.Bool => 1,
-			ResultType.Int => 1,
-			ResultType.Float => 1,
-			ResultType.Vector2 => 2,
-			ResultType.Vector3 => 3,
-			ResultType.Vector4 => 4,
-			ResultType.VoidFunction => 0,
-			_ => 0
-		};
-	}
-
-	public NodeResult( ResultType resultType, string metaDataName, object actualMetaData )
-	{
-		ResultType = resultType;
-		Code = "";
-		Constant = true;
-		IsMetaDataResult = true;
-
-		Metadata = new();
-		AddMetadataEntry( metaDataName, actualMetaData );
 
 		Components = ResultType switch
 		{
@@ -332,7 +233,7 @@ public struct NodeResult : IValid
 	{
 		if ( components > 4 )
 		{
-			throw new Exception( $"There is no float type with a component count of \"{components}\"" );
+			throw new Exception( $"There is no float type with a component count of `{components}`" );
 		}
 
 		if ( !CanCast )
