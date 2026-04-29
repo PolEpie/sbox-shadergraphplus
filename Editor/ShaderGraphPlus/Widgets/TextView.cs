@@ -8,14 +8,14 @@ public class TextView : Widget
 {
 	public Action TextChanged;
 
-	private string Text = "";
-	private TextEdit TextEdit;
+	private string _contents = "";
+	private TextEdit _textEdit;
 
 	public TextView( Widget parent, string windowTitle, string text ) : base( parent )
 	{
 		Name = windowTitle;
 		WindowTitle = windowTitle;
-		Text = text;
+		_contents = text;
 		Parent = parent;
 		SetWindowIcon( "edit" );
 
@@ -27,25 +27,25 @@ public class TextView : Widget
 
 		//Layout.Add( LineNumbers );
 
-		TextEdit = new TextEdit( this );
-		TextEdit.ReadOnly = true;
-		Text = text;
-		TextEdit.PlainText = Text;
-		TextEdit.VerticalScrollbarMode = ScrollbarMode.On;
-		TextEdit.TextChanged += x =>
+		_textEdit = new TextEdit( this );
+		_textEdit.ReadOnly = true;
+		_contents = text;
+		_textEdit.PlainText = _contents;
+		_textEdit.VerticalScrollbarMode = ScrollbarMode.On;
+		_textEdit.TextChanged += x =>
 		{
 			TextChanged?.Invoke();
 		};
 
-		TextEdit.SetStyles( $"font-size: 12px; font-weight: regular; color: {Theme.TextControl.Hex};" );
+		_textEdit.SetStyles( $"font-size: 12px; font-weight: regular; color: {Theme.TextControl.Hex};" );
 
-		Layout.Add( TextEdit );
+		Layout.Add( _textEdit );
 	}
 
 
 	public string GetTextContents()
 	{
-		return Text;
+		return _contents;
 	}
 
 	public void SetTextContents( string text )
@@ -56,7 +56,7 @@ public class TextView : Widget
 			text = text.Replace( "    ", "\t" );
 		}
 
-		Text = text;
-		TextEdit.PlainText = Text;
+		_contents = text;
+		_textEdit.PlainText = _contents;
 	}
 }
