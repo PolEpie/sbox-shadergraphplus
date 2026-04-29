@@ -3,7 +3,6 @@
 internal static class ShaderGraphPlusFileSystem
 {
 	public static BaseFileSystem Root => Editor.FileSystem.Libraries.CreateSubSystem( GetLibraryFolderName() );
-	public static BaseFileSystem Content => Editor.FileSystem.Libraries.CreateSubSystem( GetLibraryFolderName() );
 
 	/// <summary>
 	/// Get the name of the Shader Graph Plus library folder.

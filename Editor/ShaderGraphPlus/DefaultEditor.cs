@@ -110,11 +110,6 @@ public class DefaultEditor : ValueEditor
 		rect.Height )
 				.Shrink( 0f, 2f, 0f, 2f );
 
-		//if ( eventArgs.Icon is not null )
-		//{
-		//	valueRect = valueRect.Grow( 20f, 0f, 0f, 0f );
-		//}
-
 		var handleConfig = Plug.HandleConfig;
 		Paint.SetPen( handleConfig.Color, 4f );
 		Paint.DrawLine( rect.Center.WithX( rect.Left - 9f - 2f ), rect.Center.WithX( rect.Left ) );

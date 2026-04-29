@@ -135,8 +135,10 @@ public class MainWindow : DockWindow
 
 	private void OpenProjectCreationDialog()
 	{
-		ProjectCreator = new ProjectCreator();
-		ProjectCreator.DeleteOnClose = true;
+		ProjectCreator = new ProjectCreator
+		{
+			DeleteOnClose = true
+		};
 
 		var initialPath = $"{Project.Current.GetAssetsPath().Replace( "\\", "/" )}/Shaders";
 		if ( !Directory.Exists( initialPath ) )
@@ -147,7 +149,6 @@ public class MainWindow : DockWindow
 		ProjectCreator.FolderEditPath = initialPath;
 		ProjectCreator.Show();
 		ProjectCreator.OnProjectCreated += OpenProject;
-
 	}
 
 	public void AssetOpen( Asset asset )
@@ -193,7 +194,6 @@ public class MainWindow : DockWindow
 			}
 
 			_properties.Target = parameter;
-			//_blackboardView.SetSelection( parameter );
 		}
 		else if ( selection is ShaderGraphPlus )
 		{
@@ -329,33 +329,6 @@ public class MainWindow : DockWindow
 	protected virtual void Compile()
 	{
 		_shaderCompileErrors.Clear();
-
-		// Doing it in GeneratePreviewCode() instead when evaluating all the nodes.
-		// So that the Output widget dosent get cleared when you move a node or update the graph
-		// in any way. - QuackCola
-		/*
-		var compileErrors = new List<GraphCompiler.Error>();
-		foreach ( var node in _graph.Nodes )
-		{
-			if ( node is IErroringNode erroring )
-			{
-				var errors = erroring.GetErrors();
-				if ( errors.Count > 0 )
-				{
-					_shaderCompileErrors.AddRange( errors );
-		
-					if ( IsSubgraph )
-					{
-						foreach ( var error in errors )
-						{
-							compileErrors.Add( new() { Message = error, Node = node } );
-						}
-					}
-				}
-			}
-		}
-		_output.Errors = compileErrors;
-		*/
 
 		if ( string.IsNullOrWhiteSpace( _generatedCode ) )
 		{
@@ -669,14 +642,6 @@ public class MainWindow : DockWindow
 		{
 			node.ClearError();
 
-			// Nodes used to fuck up attributes. Uncomment these two lines later
-			// if its discoverd that they still do. Then fix the issue for good.
-			/*
-			// TEMP!!! 
-			if ( node is BooleanFeatureSwitchNode || node is EnumFeatureSwitchNode  )
-				continue;
-			*/
-
 			// Assign a PreviewID to any Previewable node.
 			if ( node.CanPreview )
 			{
@@ -817,13 +782,9 @@ public class MainWindow : DockWindow
 			}
 		}
 
-		//_compiledNodes.Clear();
-		//_compiledNodes.AddRange( compiler.Nodes );
-
 		if ( _properties.IsValid() && _properties.Target is BaseNodePlus targetNode && targetNode.CanPreview )
 		{
 			_preview3D.SetStage( targetNode.PreviewID );
-			//_preview.SetStage( _compiledNodes.IndexOf( targetNode ) + 1 );
 		}
 		else
 		{

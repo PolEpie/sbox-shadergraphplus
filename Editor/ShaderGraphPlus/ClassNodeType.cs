@@ -124,11 +124,6 @@ public sealed class ParameterNodeType : ClassNodeType
 
 	string ImagePath;
 
-	public ParameterNodeType( TypeDescription type, BlackboardParameter parameter ) : base( type )
-	{
-		Parameter = parameter;
-	}
-
 	public ParameterNodeType( BlackboardParameter parameter ) : base( null )
 	{
 		Parameter = parameter;
