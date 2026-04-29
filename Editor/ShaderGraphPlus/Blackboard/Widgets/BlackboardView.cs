@@ -67,7 +67,7 @@ public class BlackboardView : Widget
 		_subHeader.Alignment = TextFlag.LeftCenter;
 
 		_addButton = _subHeader.Add( new AddButton() );
-		_addButton.MouseLeftPress = CreateParameterTypeSelectionPopupMenu;
+		_addButton.MouseLeftPress = TypeSelectionMenu;
 
 		_search = _subHeader.Add( new LineEdit(), 1 );
 		_search.PlaceholderText = "⌕  Search";
@@ -143,7 +143,7 @@ public class BlackboardView : Widget
 		}
 	}
 
-	private void CreateParameterTypeSelectionPopupMenu()
+	private void TypeSelectionMenu()
 	{
 		var contextManu = new ContextMenu( _treeView );
 
