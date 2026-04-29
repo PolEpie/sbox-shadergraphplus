@@ -1310,6 +1310,8 @@ public sealed partial class GraphCompiler
 		return new();
 	}
 
+	// TODO : Fix this up
+	/*
 	public string GeneratePostProcessingComponent( PostProcessingComponentInfo postProcessiComponentInfo, string className, string shaderPath )
 	{
 		var ppcb = new PostProcessingComponentBuilder( postProcessiComponentInfo );
@@ -1347,6 +1349,7 @@ public sealed partial class GraphCompiler
 
 		return ppcb.Finish( className, shaderPath );
 	}
+	*/
 
 	/// <summary>
 	/// Generate shader code, will evaluate the graph if it hasn't already.
