@@ -30,7 +30,7 @@ public static class JsonUtils
 		if ( obj.TryGetPropertyValue( oldKey, out var jsonNode ) && obj.Remove( oldKey ) )
 		{
 			obj.Add( newKey, jsonNode );
-		
+
 			return true;
 		}
 
@@ -42,7 +42,7 @@ public static class JsonUtils
 		if ( obj.Remove( targetKey ) )
 		{
 			obj.Add( targetKey, JsonSerializer.SerializeToNode( newData, options ?? SerializerOptions() ) );
-		
+
 			return true;
 		}
 
@@ -51,7 +51,7 @@ public static class JsonUtils
 
 #nullable disable
 
-	public static bool GetPropertyValue<T>( JsonObject obj, string targetKey, JsonSerializerOptions options, T defaultValue, out T data)
+	public static bool GetPropertyValue<T>( JsonObject obj, string targetKey, JsonSerializerOptions options, T defaultValue, out T data )
 	{
 		data = defaultValue;
 

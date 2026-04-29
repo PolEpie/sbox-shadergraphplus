@@ -248,7 +248,7 @@ public class ShaderGraphPlusView : GraphView
 					x.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) ).OrderBy( x =>
 						x.Type.GetAttribute<OrderAttribute>().Value ) )
 				{
-					 NewParameterMenuOption( newSubgraphOutputParameterMenu, "SubgraphOutput", classType, "Add Subgraph Output Parameter" );
+					NewParameterMenuOption( newSubgraphOutputParameterMenu, "SubgraphOutput", classType, "Add Subgraph Output Parameter" );
 				}
 			}
 

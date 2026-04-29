@@ -90,7 +90,7 @@ public partial class ShaderGraphPlus
 				JsonUtils.GetPropertyValue<SubgraphPortType>( updatedNodeObject, "OutputType", SerializerOptions(), SubgraphPortType.Vector3, out var outputType );
 				JsonUtils.GetPropertyValue<SubgraphOutputPreviewType>( updatedNodeObject, "Preview", SerializerOptions(), SubgraphOutputPreviewType.None, out var previewType );
 				JsonUtils.GetPropertyValue<int>( updatedNodeObject, "PortOrder", SerializerOptions(), 0, out var portOrder );
-				
+
 				IBlackboardSubgraphOutputParameter parameter = outputType switch
 				{
 					SubgraphPortType.Bool => new BoolSubgraphOutputParameter()
