@@ -5,7 +5,7 @@ internal sealed class ShaderFeatureReferenceAttribute : Attribute
 {
 }
 
-public class ShaderFeatureBase : IValid
+public abstract class ShaderFeatureBase : IValid
 {
 	/// <summary>
 	/// Name of this feature.
