@@ -269,7 +269,7 @@ public sealed partial class GraphCompiler
 	{
 		if ( !ShaderResult.VoidFunctionLocals.ContainsKey( nodeID ) )
 		{
-			var outputData = new List<VoidFunctionOutputData>();
+			var outputData = new List<VoidFunctionResult>();
 			var functionOutputsSb = new StringBuilder();
 
 			foreach ( var output in outputResults.Index() )
@@ -280,7 +280,7 @@ public sealed partial class GraphCompiler
 
 				functionOutputsSb.Append( (output.Index + 1) == outputResults.Count ? $"{compilerName}" : $" {compilerName}, " );
 
-				VoidFunctionOutputData data = new(
+				VoidFunctionResult data = new(
 					userAssignedname,
 					compilerName,
 					GetResultTypeFromHLSLDataType( output.Item.Value )
@@ -304,7 +304,7 @@ public sealed partial class GraphCompiler
 				throw new NotImplementedException( $"Unknown CustomFunction mode '{mode}'" );
 			}
 
-			var voidData = new VoidFunctionData(
+			var voidData = new VoidFunctionInfo(
 				outputData,
 				funcCall,
 				SubgraphNode == null ? nodeID : SubgraphNode.Identifier,
@@ -676,7 +676,7 @@ public sealed partial class GraphCompiler
 					return default;
 				}
 
-				if ( ShaderResult.VoidFunctionLocals.TryGetValue( node.Identifier, out VoidFunctionData data ) ) //&& !data.IsAlreadyPostProcessed )
+				if ( ShaderResult.VoidFunctionLocals.TryGetValue( node.Identifier, out VoidFunctionInfo data ) ) //&& !data.IsAlreadyPostProcessed )
 				{
 					funcResult.SetVoidLocalTargetID( node.Identifier );
 

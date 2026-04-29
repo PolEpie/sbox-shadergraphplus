@@ -1,6 +1,6 @@
 ﻿namespace ShaderGraphPlus;
 
-internal struct VoidFunctionOutputData : IValid
+internal struct VoidFunctionResult : IValid
 {
 	public string UserAssignedName { get; private set; }
 	public string CompilerAssignedName { get; private set; }
@@ -8,7 +8,7 @@ internal struct VoidFunctionOutputData : IValid
 
 	public readonly bool IsValid => !string.IsNullOrWhiteSpace( UserAssignedName ) || ResultType != ResultType.Invalid;
 
-	public VoidFunctionOutputData( string userAssignedName, string compilerAssignedName, ResultType resultType )
+	public VoidFunctionResult( string userAssignedName, string compilerAssignedName, ResultType resultType )
 	{
 		UserAssignedName = userAssignedName;
 		CompilerAssignedName = compilerAssignedName;
@@ -21,9 +21,9 @@ internal struct VoidFunctionOutputData : IValid
 	}
 }
 
-internal struct VoidFunctionData : IValid
+internal struct VoidFunctionInfo : IValid
 {
-	public List<VoidFunctionOutputData> TargetResults { get; private set; }
+	public List<VoidFunctionResult> TargetResults { get; private set; }
 
 	public string FunctionCall { get; private set; }
 
@@ -48,7 +48,7 @@ internal struct VoidFunctionData : IValid
 	/// <param name="functionCall"></param>
 	/// <param name="nodeIdentifier"></param>
 	/// <param name="isIncludedFunction"></param>
-	public VoidFunctionData( List<VoidFunctionOutputData> targetResults, string functionCall, string nodeIdentifier, bool isIncludedFunction )
+	public VoidFunctionInfo( List<VoidFunctionResult> targetResults, string functionCall, string nodeIdentifier, bool isIncludedFunction )
 	{
 		TargetResults = targetResults;
 		FunctionCall = functionCall;
@@ -90,7 +90,7 @@ internal struct VoidFunctionData : IValid
 		if ( result.IsValid )
 			return result.ResultType;
 
-		throw new Exception( $"Key `{compilerAssignedName}` does not exist within `{nameof( VoidFunctionData.TargetResults )}`" );
+		throw new Exception( $"Key `{compilerAssignedName}` does not exist within `{nameof( VoidFunctionInfo.TargetResults )}`" );
 	}
 
 	public string GetCompilerAssignedName( string userAssignedName )
