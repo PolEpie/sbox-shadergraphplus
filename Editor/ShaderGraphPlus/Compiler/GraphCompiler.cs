@@ -2008,7 +2008,7 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 					// Init all the output results.
 					foreach ( var outResult in data.TargetResults )
 					{
-						sb.AppendLine( IndentString( LocalResultInitialize( outResult.ResultType, outResult.CompilerAssignedName ), indentLevel ) );
+						sb.AppendLine( IndentString( InitializeVariable( outResult.ResultType, outResult.CompilerAssignedName ), indentLevel ) );
 					}
 
 					sb.AppendLine( IndentString( $"{data.FunctionCall};", indentLevel ) );
@@ -2137,7 +2137,7 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 		};
 	}
 
-	private static string LocalResultInitialize( ResultType resultType, string name )
+	private static string InitializeVariable( ResultType resultType, string name )
 	{
 		switch ( resultType )
 		{

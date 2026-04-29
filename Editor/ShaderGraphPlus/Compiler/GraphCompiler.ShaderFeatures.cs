@@ -143,7 +143,7 @@ public sealed partial class GraphCompiler
 
 			if ( index == 0 )
 			{
-				sb.AppendLine( LocalResultInitialize( resultType, resultAssignmentLocal ) ); //$"{resultDataType} {resultLocal};" );
+				sb.AppendLine( InitializeVariable( resultType, resultAssignmentLocal ) ); //$"{resultDataType} {resultLocal};" );
 
 				if ( shaderFeature is ShaderFeatureBoolean boolFeature )
 				{
