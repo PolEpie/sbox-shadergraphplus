@@ -149,28 +149,11 @@ public class BlackboardView : Widget
 
 		IBlackboardParameterType[] avalibleTypes = BlackboardParameter.GetRelevantParameters( _availableParameters, Graph.IsSubgraph ).ToArray();
 
-		if ( !Graph.IsSubgraph )
+
+		//if ( !Graph.IsSubgraph )
 		{
-			var materialParametersMenu = m.AddMenu( "Input", "input" );
-
-			foreach ( var parameterType in avalibleTypes.OfType<ClassBlackboardParameterType>().OrderBy( x => x.Type.Order ) )
-			{
-				var icon = parameterType.DisplayInfo.Icon;
-				var description = parameterType.DisplayInfo.Description;
-
-				var option = materialParametersMenu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
-				{
-					CreateNewParameter( parameterType );
-
-					m.Update();
-					m.Close();
-				} );
-
-				option.ToolTip = description;
-			}
-		}
-		else
-		{
+			var materialParametersMenu = m.AddMenu( "Parameters", "edit_attributes" );
+			var materialFeaturesMenu = m.AddMenu( "Combos", "alt_route" );
 			var subgraphInputsMenu = m.AddMenu( "Input", "input" );
 			var subgraphOutputsMenu = m.AddMenu( "Output", "output" );
 
@@ -179,26 +162,34 @@ public class BlackboardView : Widget
 				var icon = parameterType.DisplayInfo.Icon;
 				var description = parameterType.DisplayInfo.Description;
 
-				if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) )
-				{
-					subgraphInputsMenu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
-					{
-						CreateNewParameter( parameterType );
+				Menu menu = m;
 
-						m.Update();
-						m.Close();
-					} );
+				if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardMaterialParameter ) ) )
+				{
+					menu = materialParametersMenu;
+				}
+				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardShaderFeatureParameter ) ) )
+				{
+					menu = materialFeaturesMenu;
+				}
+				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) )
+				{
+					menu = subgraphInputsMenu;
 				}
 				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) )
 				{
-					subgraphOutputsMenu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
-					{
-						CreateNewParameter( parameterType );
-
-						m.Update();
-						m.Close();
-					} );
+					menu = subgraphOutputsMenu;
 				}
+
+				var option = menu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
+				{
+					CreateNewParameter( parameterType );
+
+					m.Update();
+					m.Close();
+				} );
+
+				option.ToolTip = description;
 			}
 		}
 
@@ -536,7 +527,18 @@ file class BlackboardParameterNode : TreeNode<BlackboardParameter>
 	{
 		var tooltip = Name.WithColor( "#9CDCFE" );
 
-		var desc = DisplayInfo.Description ?? "No description given.";
+		var usrDesc = DisplayInfo.Description;
+
+		if ( Value is IBlackboardSubgraphInputParameter inputParameter )
+		{
+			usrDesc = inputParameter.InputDescription;
+		}
+		else if ( Value is IBlackboardSubgraphOutputParameter outputParameter )
+		{
+			usrDesc = outputParameter.OutputDescription;
+		}
+
+		var desc = usrDesc ?? "No description given.";
 		tooltip += desc.StartsWith( "<br/>", StringComparison.OrdinalIgnoreCase )
 			? desc
 			: $"<br/>{desc}";

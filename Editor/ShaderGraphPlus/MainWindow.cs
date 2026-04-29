@@ -585,7 +585,7 @@ public class MainWindow : DockWindow
 		ShaderFeatures.Clear();
 		registrationIssues = new();
 
-		var features = _graph.Parameters.OfType<IShaderFeatureParameter>();
+		var features = _graph.Parameters.OfType<IBlackboardShaderFeatureParameter>();
 
 		foreach ( var feature in features )
 		{

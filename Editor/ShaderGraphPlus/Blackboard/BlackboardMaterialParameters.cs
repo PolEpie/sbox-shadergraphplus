@@ -156,7 +156,7 @@ public sealed class Float4Parameter : BlackboardMaterialParameter<Vector4, Float
 }
 
 /// <summary>
-/// Color vmaterial parameter
+/// Color material parameter
 /// </summary>
 [Title( "Color" ), Icon( "palette" ), Order( 6 )]
 public sealed class ColorParameter : BlackboardMaterialParameter<Color, GenericParameterUI>
@@ -234,7 +234,7 @@ public sealed class SamplerStateParameter : BlackboardGenericParameter<Sampler>
 ///
 /// </summary>
 [Title( "Shader Feature Boolean" ), Icon( "tune" ), Order( 9 )]
-public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IShaderFeatureParameter
+public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IBlackboardShaderFeatureParameter
 {
 	[Hide, JsonIgnore, Browsable( false )]
 	public override bool IsValid => !string.IsNullOrWhiteSpace( Name );
@@ -278,7 +278,7 @@ public sealed class ShaderFeatureBooleanParameter : BlackboardParameter, IShader
 ///
 /// </summary>
 [Title( "Shader Feature Enum" ), Icon( "tune" ), Order( 10 )]
-public sealed class ShaderFeatureEnumParameter : BlackboardParameter, IShaderFeatureParameter
+public sealed class ShaderFeatureEnumParameter : BlackboardParameter, IBlackboardShaderFeatureParameter
 {
 	[Hide, JsonIgnore, Browsable( false )]
 	public override bool IsValid => !string.IsNullOrWhiteSpace( Name ) && Options.All( x => !string.IsNullOrWhiteSpace( x.Name ) );

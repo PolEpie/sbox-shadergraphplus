@@ -227,7 +227,7 @@ public class ShaderGraphPlusView : GraphView
 						x.Type.GetAttribute<OrderAttribute>().Value ) )
 				{
 
-					var baseName = !classType.Type.TargetType.IsAssignableTo( typeof( IShaderFeatureParameter ) ) ? "MaterialParameter" : "ShaderFeature";
+					var baseName = !classType.Type.TargetType.IsAssignableTo( typeof( IBlackboardShaderFeatureParameter ) ) ? "MaterialParameter" : "ShaderFeature";
 					NewParameterMenuOption( newMaterialParameterMenu, baseName, classType, "Add Material Parameter" );
 				}
 			}
