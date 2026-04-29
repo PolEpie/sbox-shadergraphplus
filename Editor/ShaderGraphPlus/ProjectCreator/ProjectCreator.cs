@@ -103,7 +103,7 @@ public class ProjectCreator : Dialog
 
 			if ( _activeTemplate != null )
 			{
-				Log.Info( $"Active template : {_activeTemplate.TemplatePath}" );
+				SGPLogger.Info( $"Active template : {_activeTemplate.TemplatePath}" );
 			}
 
 			//listViewBody.AddSpacingCell(128f);

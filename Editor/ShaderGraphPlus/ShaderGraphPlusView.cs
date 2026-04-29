@@ -352,14 +352,14 @@ public class ShaderGraphPlusView : GraphView
 
 	public override void PushUndo( string name )
 	{
-		Log.Info( $"Push Undo ({name})" );
+		SGPLogger.Info( $"Push Undo ({name})" );
 		_undoStack.PushUndo( name, Graph.UndoStackSerialize() );
 		_window.OnUndoPushed();
 	}
 
 	public override void PushRedo()
 	{
-		Log.Info( "Push Redo" );
+		SGPLogger.Info( "Push Redo" );
 		_undoStack.PushRedo( Graph.UndoStackSerialize() );
 		_window.SetDirty();
 	}

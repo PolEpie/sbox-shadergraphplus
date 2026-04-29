@@ -210,14 +210,14 @@ public class BlackboardView : Widget
 
 	public void PushUndo( string name )
 	{
-		Log.Info( $"Push Undo ({name})" );
+		SGPLogger.Info( $"Push Undo ({name})" );
 		_undoStack.PushUndo( name, Graph.UndoStackSerialize() );
 		_window.OnUndoPushed();
 	}
 
 	public void PushRedo()
 	{
-		Log.Info( "Push Redo" );
+		SGPLogger.Info( "Push Redo" );
 		_undoStack.PushRedo( Graph.UndoStackSerialize() );
 		_window.SetDirty();
 	}

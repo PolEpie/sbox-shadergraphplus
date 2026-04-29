@@ -970,7 +970,7 @@ public class MainWindow : DockWindow
 	{
 		if ( _undoStack.Undo() is UndoOp op )
 		{
-			Log.Info( $"Undo ({op.name})" );
+			SGPLogger.Info( $"Undo ({op.name})" );
 
 			_redoOption.Enabled = _undoStack.CanUndo;
 
@@ -992,7 +992,7 @@ public class MainWindow : DockWindow
 	{
 		if ( _undoStack.Redo() is UndoOp op )
 		{
-			Log.Info( $"Redo ({op.name})" );
+			SGPLogger.Info( $"Redo ({op.name})" );
 
 			_redoOption.Enabled = _undoStack.CanRedo;
 
@@ -1013,7 +1013,7 @@ public class MainWindow : DockWindow
 	{
 		if ( _undoStack.SetUndoLevel( level ) is UndoOp op )
 		{
-			Log.Info( $"SetUndoLevel ({op.name})" );
+			SGPLogger.Info( $"SetUndoLevel ({op.name})" );
 
 			_graph.ClearNodes();
 			_graph.ClearParameters();

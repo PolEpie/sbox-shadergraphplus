@@ -355,7 +355,7 @@ public class GraphView : GraphicsView, IGridSizeView
 		}
 		catch
 		{
-			Log.Warning( "Paste is not valid base64" );
+			SGPLogger.Warning( "Paste is not valid base64" );
 			return;
 		}
 
@@ -373,7 +373,7 @@ public class GraphView : GraphicsView, IGridSizeView
 		}
 		catch ( Exception e )
 		{
-			Log.Warning( $"Paste is not valid json: {e}" );
+			SGPLogger.Warning( $"Paste is not valid json: {e}" );
 		}
 	}
 

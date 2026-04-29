@@ -52,7 +52,7 @@ public class UndoStack
 	{
 		if ( _redoPending )
 		{
-			Log.Warning( "Pending Redo!" );
+			SGPLogger.Warning( "Pending Redo!" );
 			return null;
 		}
 
@@ -70,7 +70,7 @@ public class UndoStack
 	{
 		if ( _redoPending )
 		{
-			Log.Warning( "Pending Redo!" );
+			SGPLogger.Warning( "Pending Redo!" );
 			return null;
 		}
 
@@ -88,7 +88,7 @@ public class UndoStack
 	{
 		if ( _redoPending )
 		{
-			Log.Warning( "Pending Redo!" );
+			SGPLogger.Warning( "Pending Redo!" );
 			return null;
 		}
 

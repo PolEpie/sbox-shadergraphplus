@@ -718,7 +718,7 @@ public sealed partial class GraphCompiler
 				}
 
 
-				Log.Error( "Failed to get localResult" );
+				SGPLogger.Error( "Failed to get localResult" );
 			}
 			else
 			{
@@ -1956,7 +1956,7 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 			{
 				if ( ConCommands.VerboseDebgging )
 				{
-					Log.Info( $"{gradient.Key} Gradient Color {colorindex} : {color.Value} Time : {color.Time}" );
+					SGPLogger.Info( $"{gradient.Key} Gradient Color {colorindex} : {color.Value} Time : {color.Time}" );
 				}
 
 				// All good with time as the 4th component?
