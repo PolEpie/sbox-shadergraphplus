@@ -2008,7 +2008,7 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 					// Init all the output results.
 					foreach ( var outResult in data.TargetResults )
 					{
-						sb.AppendLine( IndentString( data.ResultInit( outResult.CompilerAssignedName, outResult.ResultType ), indentLevel ) );
+						sb.AppendLine( IndentString( LocalResultInitialize( outResult.ResultType, outResult.CompilerAssignedName ), indentLevel ) );
 					}
 
 					sb.AppendLine( IndentString( $"{data.FunctionCall};", indentLevel ) );
