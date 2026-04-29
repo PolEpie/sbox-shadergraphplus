@@ -24,11 +24,11 @@ public class ClassBlackboardParameterType : IBlackboardParameterType
 		if ( string.IsNullOrWhiteSpace( name ) )
 		{
 			string baseName;
-			if ( Type.TargetType.IsAssignableFrom( typeof( IBlackboardSubgraphInputParameter ) ) )
+			if ( Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) )
 			{
 				baseName = "SubgraphInput";
 			}
-			else if ( Type.TargetType.IsAssignableFrom( typeof( IBlackboardSubgraphOutputParameter ) ) )
+			else if ( Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) )
 			{
 				baseName = "SubgraphOutput";
 			}
