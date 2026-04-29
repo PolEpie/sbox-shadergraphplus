@@ -29,7 +29,11 @@ public interface IRangedBlackboardMaterialParameter : IBlackboardParameter
 	object GetRangeMax();
 }
 
-public interface IBlackboardSubgraphInputParameter : IBlackboardParameter
+public interface IBlackboardSubgraphParameter : IBlackboardParameter
+{
+}
+
+public interface IBlackboardSubgraphInputParameter : IBlackboardSubgraphParameter
 {
 	/// <summary>
 	/// Description of what this input does
@@ -49,7 +53,7 @@ public interface IBlackboardSubgraphInputParameter : IBlackboardParameter
 	abstract SubgraphPortType InputType { get; }
 }
 
-public interface IBlackboardSubgraphOutputParameter : IBlackboardParameter
+public interface IBlackboardSubgraphOutputParameter : IBlackboardSubgraphParameter
 {
 	bool IsValid { get; }
 
@@ -570,5 +574,10 @@ public abstract class BlackboardTextureMaterialParameter : BlackboardParameter
 		}
 
 		Value = (TextureInput)value;
+	}
+
+	public IParameterUI GetParameterUI()
+	{
+		throw new NotImplementedException();
 	}
 }
