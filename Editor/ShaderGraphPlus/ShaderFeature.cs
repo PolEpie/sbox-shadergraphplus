@@ -90,7 +90,6 @@ public sealed class ShaderFeatureEnumOption : IValid
 		Id = Guid.NewGuid();
 	}
 
-
 	public override string ToString()
 	{
 		return Name;
