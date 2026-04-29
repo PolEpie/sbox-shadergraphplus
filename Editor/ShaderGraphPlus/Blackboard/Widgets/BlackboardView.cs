@@ -145,55 +145,51 @@ public class BlackboardView : Widget
 
 	private void CreateParameterTypeSelectionPopupMenu()
 	{
-		var m = new ContextMenu( _treeView );
+		var contextManu = new ContextMenu( _treeView );
 
 		IBlackboardParameterType[] avalibleTypes = BlackboardParameter.GetRelevantParameters( _availableParameters, Graph.IsSubgraph ).ToArray();
 
+		var materialParametersMenu = contextManu.AddMenu( "Parameters", "edit_attributes" );
+		var materialCombosMenu = contextManu.AddMenu( "Combos", "alt_route" );
+		var subgraphInputsMenu = contextManu.AddMenu( "Input", "input" );
+		var subgraphOutputsMenu = contextManu.AddMenu( "Output", "output" );
 
-		//if ( !Graph.IsSubgraph )
+		foreach ( var parameterType in avalibleTypes.OfType<ClassBlackboardParameterType>().OrderBy( x => x.Type.Order ) )
 		{
-			var materialParametersMenu = m.AddMenu( "Parameters", "edit_attributes" );
-			var materialFeaturesMenu = m.AddMenu( "Combos", "alt_route" );
-			var subgraphInputsMenu = m.AddMenu( "Input", "input" );
-			var subgraphOutputsMenu = m.AddMenu( "Output", "output" );
+			var icon = parameterType.DisplayInfo.Icon;
+			var description = parameterType.DisplayInfo.Description;
 
-			foreach ( var parameterType in avalibleTypes.OfType<ClassBlackboardParameterType>().OrderBy( x => x.Type.Order ) )
+			Menu menu = contextManu;
+
+			if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardMaterialParameter ) ) )
 			{
-				var icon = parameterType.DisplayInfo.Icon;
-				var description = parameterType.DisplayInfo.Description;
-
-				Menu menu = m;
-
-				if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardMaterialParameter ) ) )
-				{
-					menu = materialParametersMenu;
-				}
-				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardShaderFeatureParameter ) ) )
-				{
-					menu = materialFeaturesMenu;
-				}
-				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) )
-				{
-					menu = subgraphInputsMenu;
-				}
-				else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) )
-				{
-					menu = subgraphOutputsMenu;
-				}
-
-				var option = menu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
-				{
-					CreateNewParameter( parameterType );
-
-					m.Update();
-					m.Close();
-				} );
-
-				option.ToolTip = description;
+				menu = materialParametersMenu;
 			}
+			else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardShaderFeatureParameter ) ) )
+			{
+				menu = materialCombosMenu;
+			}
+			else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphInputParameter ) ) )
+			{
+				menu = subgraphInputsMenu;
+			}
+			else if ( parameterType.Type.TargetType.IsAssignableTo( typeof( IBlackboardSubgraphOutputParameter ) ) )
+			{
+				menu = subgraphOutputsMenu;
+			}
+
+			var option = menu.AddOption( parameterType.Type.Title, !string.IsNullOrWhiteSpace( icon ) ? icon : null, () =>
+			{
+				CreateNewParameter( parameterType );
+
+				contextManu.Update();
+				contextManu.Close();
+			} );
+
+			option.ToolTip = description;
 		}
 
-		m.OpenAtCursor( false );
+		contextManu.OpenAtCursor( false );
 	}
 
 	[EditorEvent.Frame]
