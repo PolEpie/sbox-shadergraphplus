@@ -429,7 +429,13 @@ public sealed partial class GraphCompiler
 	public string ResultSampler( Sampler sampler, bool alreadyProcessed = false )
 	{
 		var name = CleanName( sampler.Name );
-		name = string.IsNullOrWhiteSpace( name ) ? $"Sampler{ShaderResult.SamplerStates.Count}" : name;
+		// For unnamed samplers generate a deterministic key from their settings so that
+		// the same default sampler coming from multiple subgraph invocations doesn't get
+		// registered as a new entry each time (which was causing 60+ duplicate samplers).
+		if ( string.IsNullOrWhiteSpace( name ) )
+		{
+			name = $"Auto_{sampler.Filter}_{sampler.AddressModeU}_{sampler.AddressModeV}_{sampler.AddressModeW}_{sampler.MaxAnisotropy}_{sampler.MipLodBias}_{sampler.IsAttribute}";
+		}
 		var id = name;
 
 		if ( IsPreview )
