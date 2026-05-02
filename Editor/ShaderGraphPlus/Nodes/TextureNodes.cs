@@ -431,6 +431,14 @@ public sealed class SampleTexture2DTriplanarNode : Texture2DSamplerBase
 	public NodeInput NormalInput { get; set; }
 
 	/// <summary>
+	/// Scalar tiling applied to the sampling position before projecting to each plane (Unity-style <c>Position * Tile</c>).
+	/// </summary>
+	[Title( "Tile" )]
+	[Input( typeof( float ), Order = 4 )]
+	[Hide]
+	public NodeInput TileInput { get; set; }
+
+	/// <summary>
 	/// Blend factor between different samples.
 	/// </summary>
 	[Title( "Blend Factor" )]
@@ -440,6 +448,8 @@ public sealed class SampleTexture2DTriplanarNode : Texture2DSamplerBase
 
 	[InlineEditor( Label = false ), Group( "Sampler" ), Order( 2 )]
 	public Sampler SamplerState { get; set; } = new Sampler();
+
+	public float DefaultTile { get; set; } = 1.0f;
 
 	public float DefaultBlendFactor { get; set; } = 4.0f;
 
@@ -476,7 +486,10 @@ public sealed class SampleTexture2DTriplanarNode : Texture2DSamplerBase
 		var coords = compiler.Result( CoordsInput );
 		var samplerGlobal = compiler.ResultSamplerOrDefault( SamplerInput, SamplerState );
 		var normal = compiler.Result( NormalInput );
+		var tile = compiler.ResultOrDefault( TileInput, DefaultTile );
 		var blendfactor = compiler.ResultOrDefault( BlendFactorInput, DefaultBlendFactor );
+		var tileScalar = GraphCompiler.EmitScalarFloat( tile, DefaultTile );
+		var blendScalar = GraphCompiler.EmitScalarFloat( blendfactor, DefaultBlendFactor );
 
 		var attributeName = texture2DResult.Code.TrimStart( "g_t" ).ToString();
 		compiler.SetAttribute( attributeName, texture );
@@ -485,8 +498,9 @@ public sealed class SampleTexture2DTriplanarNode : Texture2DSamplerBase
 			textureGlobal,
 			samplerGlobal,
 			coords.IsValid ? coords.Cast( 3 ) : "(i.vPositionWithOffsetWs.xyz + g_vHighPrecisionLightingOffsetWs.xyz) / 39.3701",
+			tileScalar,
 			normal.IsValid ? normal.Cast( 3 ) : "normalize( i.vNormalWs.xyz )",
-			$"{blendfactor}"
+			blendScalar
 		);
 
 		return new NodeResult( ResultType.Vector4, result );
@@ -518,7 +532,8 @@ public sealed class SampleTexture2DTriplanarNode : Texture2DSamplerBase
 }
 
 /// <summary>
-/// Sample a 2D texture from 3 directions, then blend based on a normal vector.
+/// Sample a normal map from 3 directions with Whiteout blending (not linear RGB lerp). Outputs <b>tangent space</b>
+/// via <c>Vec3WsToTs</c>. Do not use <see cref="SampleTexture2DTriplanarNode"/> + DecodeNormal for normals (that cross-hatches).
 /// </summary>
 [Title( "Sample Texture 2D Normal Map Triplanar" ), Category( "Textures" ), Icon( "colorize" )]
 public sealed class SampleTexture2DNormalMapTriplanarNode : Texture2DSamplerBase
@@ -548,6 +563,14 @@ public sealed class SampleTexture2DNormalMapTriplanarNode : Texture2DSamplerBase
 	public NodeInput NormalInput { get; set; }
 
 	/// <summary>
+	/// Scalar tiling applied to the sampling position before projecting to each plane (Unity-style <c>Position * Tile</c>).
+	/// </summary>
+	[Title( "Tile" )]
+	[Input( typeof( float ), Order = 4 )]
+	[Hide]
+	public NodeInput TileInput { get; set; }
+
+	/// <summary>
 	/// Blend factor between different samples.
 	/// </summary>
 	[Title( "Blend Factor" )]
@@ -557,6 +580,8 @@ public sealed class SampleTexture2DNormalMapTriplanarNode : Texture2DSamplerBase
 
 	[InlineEditor( Label = false ), Group( "Sampler" ), Order( 2 )]
 	public Sampler SamplerState { get; set; } = new Sampler();
+
+	public float DefaultTile { get; set; } = 1.0f;
 
 	public float DefaultBlendFactor { get; set; } = 4.0f;
 
@@ -595,17 +620,21 @@ public sealed class SampleTexture2DNormalMapTriplanarNode : Texture2DSamplerBase
 		var coords = compiler.Result( CoordsInput );
 		var samplerGlobal = compiler.ResultSamplerOrDefault( SamplerInput, SamplerState );
 		var normal = compiler.Result( NormalInput );
+		var tile = compiler.ResultOrDefault( TileInput, DefaultTile );
 		var blendfactor = compiler.ResultOrDefault( BlendFactorInput, DefaultBlendFactor );
+		var tileScalar = GraphCompiler.EmitScalarFloat( tile, DefaultTile );
+		var blendScalar = GraphCompiler.EmitScalarFloat( blendfactor, DefaultBlendFactor );
 
 		var attributeName = texture2DResult.Code.TrimStart( "g_t" ).ToString();
 		compiler.SetAttribute( attributeName, texture );
 
 		var result = compiler.ResultHLSLFunction( "TexTriplanar_Normal",
-		textureGlobal,
-		samplerGlobal,
-		coords.IsValid ? coords.Cast( 3 ) : "(i.vPositionWithOffsetWs.xyz + g_vHighPrecisionLightingOffsetWs.xyz) / 39.3701",
-		normal.IsValid ? normal.Cast( 3 ) : "normalize( i.vNormalWs.xyz )",
-		$"{blendfactor}"
+			textureGlobal,
+			samplerGlobal,
+			coords.IsValid ? coords.Cast( 3 ) : "(i.vPositionWithOffsetWs.xyz + g_vHighPrecisionLightingOffsetWs.xyz) / 39.3701",
+			tileScalar,
+			normal.IsValid ? normal.Cast( 3 ) : "normalize( i.vNormalWs.xyz )",
+			blendScalar
 		);
 
 		return new NodeResult( ResultType.Vector3, result );
