@@ -1,4 +1,4 @@
-﻿using Editor;
+using Editor;
 
 namespace ShaderGraphPlus;
 
@@ -440,20 +440,20 @@ float3 InvertColors( float3 vColor )
 
 	[Function( "TexTriplanar_Color" )]
 	public static string TexTriplanar_Color => @"
-float4 TexTriplanar_Color( in Texture2D tTex, in SamplerState sSampler, float3 vPosition, float3 vNormal, float BlendFactor )
+float4 TexTriplanar_Color( in Texture2D tTex, in SamplerState sSampler, float3 vPosition, float Tile, float3 vNormal, float BlendFactor )
 {
-	float2 uvX = vPosition.zy;
-	float2 uvY = vPosition.xz;
-	float2 uvZ = vPosition.xy;
+	float3 nodeUV = vPosition * Tile;
+	float2 uvX = nodeUV.yz;
+	float2 uvY = nodeUV.xz;
+	float2 uvZ = nodeUV.xy;
 
 	float3 triblend = saturate(pow(abs(vNormal), BlendFactor));
 	triblend /= max(dot(triblend, half3(1,1,1)), 0.0001);
 
 	half3 axisSign = vNormal < 0 ? -1 : 1;
-
 	uvX.x *= axisSign.x;
 	uvY.x *= axisSign.y;
-	uvZ.x *= -axisSign.z;
+	uvZ.y *= axisSign.z;
 
 	float4 colX = Tex2DS( tTex, sSampler, uvX );
 	float4 colY = Tex2DS( tTex, sSampler, uvY );
@@ -465,11 +465,12 @@ float4 TexTriplanar_Color( in Texture2D tTex, in SamplerState sSampler, float3 v
 
 	[Function( "TexTriplanar_Normal" )]
 	public static string TexTriplanar_Normal => @"
-float3 TexTriplanar_Normal( in Texture2D tTex, in SamplerState sSampler, float3 vPosition, float3 vNormal, float BlendFactor )
+float3 TexTriplanar_Normal( in Texture2D tTex, in SamplerState sSampler, float3 vPosition, float Tile, float3 vNormal, float BlendFactor )
 {
-	float2 uvX = vPosition.zy;
-	float2 uvY = vPosition.xz;
-	float2 uvZ = vPosition.xy;
+	float3 nodeUV = vPosition * Tile;
+	float2 uvX = nodeUV.yz;
+	float2 uvY = nodeUV.xz;
+	float2 uvZ = nodeUV.xy;
 
 	float3 triblend = saturate( pow( abs( vNormal ), BlendFactor ) );
 	triblend /= max( dot( triblend, half3( 1, 1, 1 ) ), 0.0001 );
@@ -478,7 +479,7 @@ float3 TexTriplanar_Normal( in Texture2D tTex, in SamplerState sSampler, float3 
 
 	uvX.x *= axisSign.x;
 	uvY.x *= axisSign.y;
-	uvZ.x *= -axisSign.z;
+	uvZ.y *= axisSign.z;
 
 	float3 tnormalX = DecodeNormal( Tex2DS( tTex, sSampler, uvX ).xyz );
 	float3 tnormalY = DecodeNormal( Tex2DS( tTex, sSampler, uvY ).xyz );
@@ -486,14 +487,14 @@ float3 TexTriplanar_Normal( in Texture2D tTex, in SamplerState sSampler, float3 
 
 	tnormalX.x *= axisSign.x;
 	tnormalY.x *= axisSign.y;
-	tnormalZ.x *= -axisSign.z;
+	tnormalZ.y *= axisSign.z;
 
-	tnormalX = half3( tnormalX.xy + vNormal.zy, vNormal.x );
+	tnormalX = half3( tnormalX.xy + vNormal.yz, vNormal.x );
 	tnormalY = half3( tnormalY.xy + vNormal.xz, vNormal.y );
 	tnormalZ = half3( tnormalZ.xy + vNormal.xy, vNormal.z );
 
 	return normalize(
-		tnormalX.zyx * triblend.x +
+		tnormalX.zxy * triblend.x +
 		tnormalY.xzy * triblend.y +
 		tnormalZ.xyz * triblend.z +
 		vNormal

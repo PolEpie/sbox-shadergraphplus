@@ -360,6 +360,17 @@ public sealed partial class GraphCompiler
 		result.Globals.Add( name, global );
 	}
 
+	/// <summary>
+	/// Emit a scalar <c>float</c> expression. If <paramref name="r"/> is float2/float3/float4, uses swizzle
+	/// so wiring a vector into a <c>float</c> HLSL parameter does not rely on implicit truncation (-Wconversion).
+	/// </summary>
+	public static string EmitScalarFloat( NodeResult r, float fallback )
+	{
+		if ( !r.IsValid || !r.IsFloatTypeResult() )
+			return $"{fallback}";
+		return r.Components > 1 ? r.Cast( 1 ) : r.Code;
+	}
+
 	public string ResultHLSLFunction( string name, params string[] args )
 	{
 		if ( !GraphHLSLFunctions.HasFunction( name ) )
@@ -2048,7 +2059,7 @@ i.vPositionWs = float3( v.vTexCoord, 0.0f );
 					{
 						// TODO
 					}
-					else if ( result.localResult.CanPreview && result.localResult.ShouldPreview && result.localResult.PreviewID != ShaderGraphPlusGlobals.GraphCompiler.NoNodePreviewID )
+					else if ( result.localResult.CanPreview && result.localResult.ShouldPreview && result.localResult.PreviewID != ShaderGraphPlusGlobals.NoNodePreviewID )
 					{
 						sb.AppendLine( IndentString( $"if ( g_iStageId == {result.localResult.PreviewID} ) return {result.localResult.Cast( 4, 1.0f )};", indentLevel ) );
 					}
