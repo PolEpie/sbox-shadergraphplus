@@ -68,6 +68,36 @@ public struct Sampler : ISGPJsonUpgradeable
 		BorderColor = Color.Transparent;
 	}
 
+	public override readonly int GetHashCode()
+	{
+		var h = new HashCode();
+		h.Add( Filter );
+		h.Add( AddressModeU );
+		h.Add( AddressModeV );
+		h.Add( AddressModeW );
+		h.Add( MaxAnisotropy );
+		h.Add( MipLodBias );
+		h.Add( IsAttribute );
+		h.Add( BorderColor );
+		return h.ToHashCode();
+	}
+
+	public override readonly bool Equals( object obj ) => obj is Sampler other && this == other;
+
+	public static bool operator ==( Sampler a, Sampler b )
+	{
+		return a.Filter == b.Filter
+			&& a.AddressModeU == b.AddressModeU
+			&& a.AddressModeV == b.AddressModeV
+			&& a.AddressModeW == b.AddressModeW
+			&& a.MaxAnisotropy == b.MaxAnisotropy
+			&& a.MipLodBias == b.MipLodBias
+			&& a.IsAttribute == b.IsAttribute
+			&& a.BorderColor == b.BorderColor;
+	}
+
+	public static bool operator !=( Sampler a, Sampler b ) => !( a == b );
+
 	public static explicit operator SamplerState( Sampler sampler )
 	{
 		return new SamplerState()

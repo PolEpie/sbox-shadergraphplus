@@ -434,8 +434,7 @@ public sealed partial class GraphCompiler
 		// registered as a new entry each time (which was causing 60+ duplicate samplers).
 		if ( string.IsNullOrWhiteSpace( name ) )
 		{
-			var hash = HashCode.Combine( sampler.Filter, sampler.AddressModeU, sampler.AddressModeV, sampler.AddressModeW, sampler.MaxAnisotropy, sampler.MipLodBias, sampler.IsAttribute );
-			name = $"Auto_{hash:X8}";
+			name = $"Auto_{sampler.GetHashCode():X8}";
 		}
 		var id = name;
 
