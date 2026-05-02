@@ -1,4 +1,4 @@
-﻿using Editor;
+using Editor;
 
 namespace ShaderGraphPlus.Nodes;
 
@@ -532,8 +532,8 @@ public sealed class SampleTexture2DTriplanarNode : Texture2DSamplerBase
 }
 
 /// <summary>
-/// Sample a normal map from 3 directions with Whiteout blending (not linear RGB lerp). Outputs <b>tangent space</b>
-/// via <c>Vec3WsToTs</c>. Do not use <see cref="SampleTexture2DTriplanarNode"/> + DecodeNormal for normals (that cross-hatches).
+/// Sample a normal map from 3 directions with Whiteout blending. Outputs <b>world-space</b> normals.
+/// Use a TransformNormal node (World → Tangent, DecodeNormal OFF) to convert before the Material Normal input.
 /// </summary>
 [Title( "Sample Texture 2D Normal Map Triplanar" ), Category( "Textures" ), Icon( "colorize" )]
 public sealed class SampleTexture2DNormalMapTriplanarNode : Texture2DSamplerBase
