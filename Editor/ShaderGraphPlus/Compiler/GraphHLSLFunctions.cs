@@ -453,7 +453,7 @@ float4 TexTriplanar_Color( in Texture2D tTex, in SamplerState sSampler, float3 v
 	half3 axisSign = vNormal < 0 ? -1 : 1;
 	uvX.x *= axisSign.x;
 	uvY.x *= axisSign.y;
-	uvZ.y *= axisSign.z;
+	uvZ.x *= -axisSign.z;
 
 	float4 colX = Tex2DS( tTex, sSampler, uvX );
 	float4 colY = Tex2DS( tTex, sSampler, uvY );
@@ -479,7 +479,7 @@ float3 TexTriplanar_Normal( in Texture2D tTex, in SamplerState sSampler, float3 
 
 	uvX.x *= axisSign.x;
 	uvY.x *= axisSign.y;
-	uvZ.y *= axisSign.z;
+	uvZ.x *= -axisSign.z;
 
 	float3 tnormalX = DecodeNormal( Tex2DS( tTex, sSampler, uvX ).xyz );
 	float3 tnormalY = DecodeNormal( Tex2DS( tTex, sSampler, uvY ).xyz );
