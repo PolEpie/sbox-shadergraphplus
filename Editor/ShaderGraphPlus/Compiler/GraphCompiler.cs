@@ -434,13 +434,18 @@ public sealed partial class GraphCompiler
 		// registered as a new entry each time (which was causing 60+ duplicate samplers).
 		if ( string.IsNullOrWhiteSpace( name ) )
 		{
-			name = $"Auto_{sampler.Filter}_{sampler.AddressModeU}_{sampler.AddressModeV}_{sampler.AddressModeW}_{sampler.MaxAnisotropy}_{sampler.MipLodBias}_{sampler.IsAttribute}";
+			var hash = HashCode.Combine( sampler.Filter, sampler.AddressModeU, sampler.AddressModeV, sampler.AddressModeW, sampler.MaxAnisotropy, sampler.MipLodBias, sampler.IsAttribute );
+			name = $"Auto_{hash:X8}";
 		}
 		var id = name;
 
 		if ( IsPreview )
 		{
-			return ResultValue( sampler ).Code;
+			// Match non-preview: one global per sampler config. Using ResultValue( sampler )
+			// assigned g_{Stage}_{Attributes.Count} for every call, blowing past API sampler limits.
+			var attribName = $"g_s{id}";
+			SetAttribute( attribName, sampler );
+			return attribName;
 		}
 
 		if ( IsNotPreview )
@@ -453,8 +458,6 @@ public sealed partial class GraphCompiler
 			{
 				//SGPLog.Warning( $"ShaderResult.SamplerStates already contains id \"{id}\"" );
 			}
-
-			return $"g_s{id}";
 		}
 
 		return $"g_s{id}";
